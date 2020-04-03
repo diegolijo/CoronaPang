@@ -10,10 +10,10 @@ public class MeuGdxGame extends Game {
     @Override
     public void create() {
 
-        try{
+
 
             //creamos una pantalla box2d le mandanmos la referencia al juego
-            Box2D box2d = new Box2D(this);
+            Box2D box2d = new Box2D(this,3);
             setScreen(box2d);
 
             //creamos un imputProcesora  le mandanmos la referencia a las pantalla box2d
@@ -23,10 +23,7 @@ public class MeuGdxGame extends Game {
             //le pasamos el procesador de entrada
             box2d.setProcesadorIn(p);
 
-        }catch(Exception e){
 
-
-        }
 
 
     }
