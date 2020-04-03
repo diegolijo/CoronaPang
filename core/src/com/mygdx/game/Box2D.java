@@ -44,15 +44,16 @@ public class Box2D extends Pantalla {
     private Contact contactoBox2d;
     //
     private boolean puedoDisparar = true;
-
-
     private boolean disparoIniciado, tocoTecho, papelUsado = false;
+
+    //---------  Procesador  ------------
+    ProcesadorIn procesadorIn;
 
 
     // fuses
-    private boolean debugStage = true;
+    private boolean debugStage = false;
     private int numBolas = 1;
-    private boolean camaraBox2d = true;
+    private boolean camaraBox2d = false;
     private int velocidadSubida;
     private float posicionPapel;
 
@@ -191,10 +192,13 @@ public class Box2D extends Pantalla {
         return puedoDisparar;
     }
 
-
     public Fixture getFixture(int indice) {
 
         return fixture[indice];
+    }
+
+    public void setProcesadorIn(ProcesadorIn p) {
+        this.procesadorIn = p;
     }
 
 
@@ -232,8 +236,8 @@ public class Box2D extends Pantalla {
     public void crearFixAvatar() {
 
         //dimensiones en metros 2x6
-        float w = 1;
-        float h = 3;
+        float w = 1.5f;
+        float h = 4;
 
         //posicionamos el avatar centrado en la pantalla
         float x = 32f;
@@ -386,11 +390,11 @@ public class Box2D extends Pantalla {
             fixture[i].getShape().setRadius(radio / reduccion);
             actoresBolas[i].setX((radio / reduccion) * 2);
             actoresBolas[i].setY((radio / reduccion) * 2);
-            actoresBolas[i].setSize(radio* 2 / reduccion * TO_PIXELES, radio * 2/ reduccion * TO_PIXELES);
-            fixture[i].getBody().applyLinearImpulse(mas * vel.x, Math.abs(mas), pos.y, pos.x, true);
+            actoresBolas[i].setSize(radio * 2 / reduccion * TO_PIXELES, radio * 2 / reduccion * TO_PIXELES);
+            fixture[i].getBody().applyLinearImpulse(mas, Math.abs(mas), pos.y, pos.x, true);
 
-            crearBola(siguieteFixture, radio / reduccion, pos.x, pos.y, vel.x, Math.abs((mas*vel.y)), 1f, actoresBolas[i].getTexture());
-            fixture[siguieteFixture - 1].getBody().applyLinearImpulse(-1 * mas * vel.x, Math.abs(mas ), pos.y, pos.x, true);
+            crearBola(siguieteFixture, radio / reduccion, pos.x, pos.y, 0, 0, 1f, actoresBolas[i].getTexture());
+            fixture[siguieteFixture - 1].getBody().applyLinearImpulse(-1 * mas, Math.abs(mas), pos.y, pos.x, true);
 
         } else {
             fixture[i].getShape().setRadius(0.1f);
@@ -419,7 +423,7 @@ public class Box2D extends Pantalla {
             velocidadSubida += 7;
             actoresBolas[4].setPosition(posicionPapel, velocidadSubida - actoresBolas[4].getHeight());
 
-            if (velocidadSubida > 350) {
+            if (velocidadSubida > 700) {
                 actoresBolas[4].setPosition(actoresBolas[4].getX(), -3600);
                 tocoTecho = true;
                 disparoIniciado = false;
