@@ -15,15 +15,20 @@ public class ActorScene2d extends Actor {
     private float y;
 
 
-    public ActorScene2d(Texture avatar,  float x, float y) {
+    public ActorScene2d(Texture avatar,  float x, float y,boolean vivo) {
         this.texture = avatar;
         this.x = x;
         this.y = y;
+        this.vivo= vivo;
         setSize(x * TO_PIXELES, y * TO_PIXELES);
     }
 
     public boolean isVivo() {
         return vivo;
+    }
+
+    public void setVivo(boolean vivo) {
+        this.vivo = vivo;
     }
 
     public void setTexture(Texture texture) {

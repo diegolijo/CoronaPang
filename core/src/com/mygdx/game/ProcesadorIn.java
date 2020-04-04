@@ -6,22 +6,19 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
+import static com.mygdx.game.Box2D.*;
+
 
 // implementa la interface InputProcessor;
 public class ProcesadorIn extends InputAdapter {
 
     private Box2D box2d;
     private Fixture fixtureAvatar;
-    private int xL, xR, A, Lw;
-    private boolean isTouchL = false, isTouchR = false;
+    private boolean isTouchL = false, isTouchR = false, puedoDisparar = true;
+    private int xL, xR, A, Lw,buttonR,buttonL;
     private int velocidadAvatar = 20;
     private Vector2 ultimoTouch = new Vector2();
 
-    private boolean puedoDisparar = true;
-    private int medioAvatarY;
-    private int medioAvatarX;
-    private int buttonR;
-    private int buttonL;
 
 
 
@@ -59,7 +56,7 @@ public class ProcesadorIn extends InputAdapter {
 
 
 
-        fixtureAvatar = box2d.getFixture(5);
+        fixtureAvatar = box2d.getFixture(AVATAR);
 
 
         //botonL
@@ -76,13 +73,6 @@ public class ProcesadorIn extends InputAdapter {
             this.buttonR = button;
         }
 
-
-
-
-
-
-
-
         return true;
     }
 
@@ -92,7 +82,7 @@ public class ProcesadorIn extends InputAdapter {
 
 
 
-        fixtureAvatar = box2d.getFixture(5);
+        fixtureAvatar = box2d.getFixture(AVATAR);
 
         // ** el (0,0) suerior izquiera
         if (screenX < 100){
