@@ -13,7 +13,7 @@ public class MeuGdxGame extends Game {
 
 
             //creamos una pantalla box2d le mandanmos la referencia al juego
-            Box2D box2d = new Box2D(this,3);
+            Box2D box2d = new Box2D(this,5);
             setScreen(box2d);
 
             //creamos un imputProcesora  le mandanmos la referencia a las pantalla box2d

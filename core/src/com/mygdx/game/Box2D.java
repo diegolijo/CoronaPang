@@ -27,9 +27,8 @@ public class Box2D extends Pantalla {
 
     //----------  scene2d  --------------
     private Stage stage;
-    private Texture textVirusVerde, textVirusRosa, textActorAvatar, textPapel, textBoton;
+    private Texture textVirusVerde, textVirusRosa, textActorAvatar, textPapel, textBotonL, textBotonR,textBotonDisparo ;
     private ActorScene2d[] actoresArray = new ActorScene2d[500];
-    private boolean contactoAvatar = false;
 
 
     //------------  box2d  ------------
@@ -42,9 +41,8 @@ public class Box2D extends Pantalla {
     private CircleShape circleShape;
     private BodyDef def = new BodyDef();
     private int siguieteElemento = 0;
-    private boolean pulsacion = false;
     private boolean colisionBox2d;
-    private boolean muriendo;
+
     private Contact contactoBox2d;
 
     //FILTROS DE MCOLISION
@@ -67,10 +65,9 @@ public class Box2D extends Pantalla {
 
     // ------------  fuses -------------
     private int numBolas;
-    private boolean camaraBox2d = true, debugStage = true;
+    private boolean camaraBox2d = false, debugStage = false;
     private int velocidadSubida;
     private float posicionPapel;
-    private int count = 0;
     private boolean invencible = true;
 
 
@@ -105,7 +102,9 @@ public class Box2D extends Pantalla {
         textVirusRosa = new Texture("virusRosa100.png");
         textActorAvatar = new Texture("avatar300x100.png");
         textPapel = new Texture("papelCulo100x3600.png");
-        textBoton = new Texture("boton100px.png");
+        textBotonL = new Texture("boton100pxL.png");
+        textBotonR = new Texture("boton100pxR.png");
+        textBotonDisparo = new Texture("boton100pxDisparo.png");
 
 
         // creamos world render y camara
@@ -116,7 +115,7 @@ public class Box2D extends Pantalla {
 
         crearEscenario();
         crearPapel();
-        crearFixAvatar();
+        crearFixAvatar();    //cear el avatar antes que el papel
         creatBotones();
         crearBolasIniciales();
 
@@ -173,6 +172,8 @@ public class Box2D extends Pantalla {
 
         }//----------------------------------------------------------------------------------------------------------------------------------
 
+        actualizarPosicionActores();
+
 
         if (disparoIniciado) {
             disparo(false);
@@ -184,9 +185,11 @@ public class Box2D extends Pantalla {
             }
         }
 
-        actualizarPosicionActores();
-
         colisionPapel();
+
+
+
+
 
 
         stage.act();
@@ -281,19 +284,19 @@ public class Box2D extends Pantalla {
 
 
         //izquierda
-        actoresArray[siguieteElemento] = new ActorScene2d(textBoton, 5, 5);
+        actoresArray[siguieteElemento] = new ActorScene2d(textBotonL, 5, 5);
         stage.addActor(actoresArray[siguieteElemento]);
         actoresArray[siguieteElemento].setPosition(0, 5); // oculramos el papel
         siguieteElemento = siguieteElemento + 1;
 
         //derecha
-        actoresArray[siguieteElemento] = new ActorScene2d(textBoton, 5, 5);
+        actoresArray[siguieteElemento] = new ActorScene2d(textBotonR, 5, 5);
         stage.addActor(actoresArray[siguieteElemento]);
         actoresArray[siguieteElemento].setPosition(100, 5); // oculramos el papel
         siguieteElemento = siguieteElemento + 1;
 
         //disparar
-        actoresArray[siguieteElemento] = new ActorScene2d(textBoton, 5, 5);
+        actoresArray[siguieteElemento] = new ActorScene2d(textBotonDisparo, 5, 5);
         stage.addActor(actoresArray[siguieteElemento]);
         actoresArray[siguieteElemento].setPosition(550, 5); // oculramos el papel
         siguieteElemento = siguieteElemento + 1;
@@ -424,6 +427,8 @@ public class Box2D extends Pantalla {
 
         }
 
+
+
     }
 
 
@@ -475,10 +480,12 @@ public class Box2D extends Pantalla {
         actoresArray[i].setX((radio / reduccion) * 2);
         actoresArray[i].setY((radio / reduccion) * 2);
         actoresArray[i].setSize(radio * 2 / reduccion * TO_PIXELES, radio * 2 / reduccion * TO_PIXELES);
-        fixture[i].getBody().applyLinearImpulse(mas, Math.abs(mas), pos.y, pos.x, true);
-
-        crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, 0, 0, 1f, actoresArray[i].getTexture());
-        fixture[siguieteElemento - 1].getBody().applyLinearImpulse(-1 * mas, Math.abs(mas), pos.y, pos.x, true);
+        //impulso despues de romper
+        fixture[i].getBody().setLinearVelocity(0,0);
+        fixture[i].getBody().applyLinearImpulse(mas, Math.abs(mas*20), pos.y, pos.x, true);
+        // impulso nueva bola
+        crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, 0,  0, 1f, actoresArray[i].getTexture());
+        fixture[siguieteElemento - 1].getBody().applyLinearImpulse(-1 * mas, Math.abs(mas)*5, pos.y, pos.x, true);
 
         if (fixture[siguieteElemento - 1].getShape().getRadius() < radioMinimo) { // comprueba el tamaño de la bola para matar bola
             fixture[i].getShape().setRadius(radio / reduccion);
