@@ -6,24 +6,24 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-import static com.mygdx.game.Box2D.*;
+import static com.mygdx.game.Box2d_Scene2d.*;
 
 
 // implementa la interface InputProcessor;
-public class ProcesadorIn extends InputAdapter {
+public class ProcesadorEntreda extends InputAdapter {
 
-    private Box2D box2d;
+    private Box2d_Scene2d box2dScene2D;
     private Fixture fixtureAvatar;
     private boolean isTouchL = false, isTouchR = false, puedoDisparar = true;
-    private int xL, xR, A, Lw,buttonR,buttonL;
+    private int xL, xR,  Lw,buttonR,buttonL;
     private int velocidadAvatar = 20;
     private Vector2 ultimoTouch = new Vector2();
 
 
 
 
-    public ProcesadorIn(Box2D box2d) {
-        this.box2d = box2d;
+    public ProcesadorEntreda(Box2d_Scene2d box2dScene2D) {
+        this.box2dScene2D = box2dScene2D;
     }
 
 
@@ -31,20 +31,22 @@ public class ProcesadorIn extends InputAdapter {
         this.puedoDisparar = puedoDisparar;
     }
 
+
+
+
+
     @Override               // posicion pantalla x - y  - numero de dedo - boton
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         this.buttonL = button;
 
 
-
+        //disparo
         if (screenX > 500 ){
-            if (box2d.isPuedoDisparar()) {
-                box2d.disparo(true);
+            if (box2dScene2D.isPuedoDisparar()) {
+                box2dScene2D.disparo(true);
                 puedoDisparar = false;
             }
         }
-
-
 
 
         return true;        // debemos indicarle con un true que hemos procesado la entrada
@@ -56,8 +58,10 @@ public class ProcesadorIn extends InputAdapter {
 
 
 
-        fixtureAvatar = box2d.getFixture(AVATAR);
+        fixtureAvatar = box2dScene2D.getFixtureArray(AVATAR);
 
+
+        // dar valores a las variables Lw , xR                          <-------------------------------------------------------------------------
 
         //botonL
         if (screenX < Lw * 2){
@@ -80,9 +84,16 @@ public class ProcesadorIn extends InputAdapter {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
 
 
+        // utilizar  Gdx.graphics.getWidth() para saber el temalo de la pantalla segun la plataforma     <------------------------------------------------
 
 
-        fixtureAvatar = box2d.getFixture(AVATAR);
+
+        if (box2dScene2D.juego.getSO()== 1){
+            screenX = screenX*2;
+            screenY = screenY*2;
+        }
+
+        fixtureAvatar = box2dScene2D.getFixtureArray(AVATAR);
 
         // ** el (0,0) suerior izquiera
         if (screenX < 100){

@@ -8,9 +8,28 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 
+
 public class MeuGdxGame extends Game {
 
+    private int SO;
+
+    public MeuGdxGame(int SO) {
+        this.SO= SO;
+    }
+
+    public int getSO() {
+        return SO;
+    }
+
+
+
+
     AssetManager manager;
+
+
+
+
+
 
     public AssetManager getManager() {
         return manager;
@@ -18,6 +37,8 @@ public class MeuGdxGame extends Game {
 
     @Override
     public void create() {
+
+      System.out.println(this.getClass().getClassLoader().getParent().toString());
 
         manager = new AssetManager();
         manager.load("virusAmarillo100.png", Texture.class);
@@ -36,16 +57,16 @@ public class MeuGdxGame extends Game {
         manager.finishLoading();
 
 
-        //creamos una pantalla box2d le mandanmos la referencia al juego
-        Box2D box2d = new Box2D(this, 5);
-        setScreen(box2d);
+        //creamos una pantalla box2dScene2D le mandanmos la referencia al juego
+        Box2d_Scene2d box2dScene2D = new Box2d_Scene2d(this, 5);
+        setScreen(box2dScene2D);
 
-        //creamos un imputProcesora  le mandanmos la referencia a las pantalla box2d
-        ProcesadorIn p = new ProcesadorIn(box2d);
+        //creamos un imputProcesora  le mandanmos la referencia a las pantalla box2dScene2D
+        ProcesadorEntreda p = new ProcesadorEntreda(box2dScene2D);
         Gdx.input.setInputProcessor(p);
 
         //le pasamos el procesador de entrada
-        box2d.setProcesadorIn(p);
+    //    box2dScene2D.setProcesadorEntreda(p);
 
 
     }

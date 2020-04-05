@@ -23,7 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 
-public class Box2D extends Pantalla {
+public class Box2d_Scene2d extends Pantalla {
 
     public static final float TO_PIXELES = 10f;
     public static int SUELO, PARED_R, TECHO, PARED_L, AVATAR, PIERNAS, PAPEL, BOTON_L, BOTON_R, BOTON_DISPARO, PRIMER_VIRUS, ELEMENT_COLISION1 = 498, ELEMENT_COLISION2 = 499;
@@ -40,8 +40,8 @@ public class Box2D extends Pantalla {
 
     //----------  scene2d  --------------
     private Stage stage;
-    private Texture textVirusVerde, textVirusRosa,textFondo, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo, textPiernas;
-    private ActorScene2d[] actoresArray = new ActorScene2d[500];
+    private Texture textVirusVerde, textVirusRosa, textFondo, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo, textPiernas;
+    private ActorScene2d[] actorArray = new ActorScene2d[500];
     private Sound sonidoBola, sonidoPedo, sonidoDisparo;
     private Music musicaLaVida;
 
@@ -49,8 +49,8 @@ public class Box2D extends Pantalla {
     private World world;
     private Box2DDebugRenderer renderer;
     private OrthographicCamera camara;
-    private Body[] body = new Body[500];
-    private Fixture[] fixture = new Fixture[500];
+    private Body[] bodyArray = new Body[500];
+    private Fixture[] fixtureArray = new Fixture[500];
     private PolygonShape shape;
     private CircleShape circleShape;
     private BodyDef def = new BodyDef();
@@ -58,8 +58,7 @@ public class Box2D extends Pantalla {
     private float velocidadInicialX = 10;
     private boolean colisionBox2d;
 
-  private Contact contactoBox2d;
-
+    private Contact contactoBox2d;
 
 
     //
@@ -67,43 +66,51 @@ public class Box2D extends Pantalla {
     private boolean disparoIniciado, tocoTecho, papelUsado = false;
 
     //---------  Procesador  ------------
-    ProcesadorIn procesadorIn;
+    ProcesadorEntreda procesadorEntreda;
 
 
     // ------------  fuses -------------
     private int numBolas;
-    private boolean camaraBox2d = false, debugStage = false;
+    private boolean camaraBox2d = true, debugStage = true, invencible = true;
     private int velocidadSubida;
     private float posicionPapel;
-    private boolean invencible = true;
 
 
-    public Box2D(MeuGdxGame juego, int numBolas) {
+    public Box2d_Scene2d(MeuGdxGame juego, int numBolas) {
         super(juego);
 
         this.numBolas = numBolas;
-        fixture[ELEMENT_COLISION1] = null;
-        fixture[ELEMENT_COLISION2] = null;
+        fixtureArray[ELEMENT_COLISION1] = null;
+        fixtureArray[ELEMENT_COLISION2] = null;
 
     }
 
-    public ActorScene2d getActoresBolas(int indice) {
-        return actoresArray[indice];
+
+
+    public Fixture getFixtureArray(int indice) {
+        return fixtureArray[indice];
     }
 
-    public Fixture getFixture(int indice) {
-
-        return fixture[indice];
+    public ActorScene2d getActorArray(int indice) {
+        return actorArray[indice];
     }
 
 
     @Override
     public void show() {
 
+        
+        if (juego.getSO() == 0) {
+            //android
+        }
+        if (juego.getSO() == 1) {
+            //desktop
+        }
+
 
 
         stage = new Stage(new FitViewport(640, 360));
-        stage.setDebugAll(debugStage);  //marca bordes de objeto se debe dartamaño a los actores
+        stage.setDebugAll(debugStage);  //marca bordes de objeto
 
 
         textVirusVerde = juego.getManager().get("virusAmarillo100.png");
@@ -145,9 +152,9 @@ public class Box2D extends Pantalla {
 
             @Override
             public void beginContact(Contact contact) {
-                //almacena en las posiciones ELEMENT_COLISION1,ELEMENT_COLISION2 las fixture en contacto
-                fixture[ELEMENT_COLISION1] = contact.getFixtureA();
-                fixture[ELEMENT_COLISION2] = contact.getFixtureB();
+                //almacena en las posiciones ELEMENT_COLISION1,ELEMENT_COLISION2 las fixtureArray en contacto
+                fixtureArray[ELEMENT_COLISION1] = contact.getFixtureA();
+                fixtureArray[ELEMENT_COLISION2] = contact.getFixtureB();
                 contactoBox2d = contact;
                 colisionBox2d = true;
             }
@@ -173,6 +180,7 @@ public class Box2D extends Pantalla {
     }
 
 
+
     @Override
     public void render(float delta) {
 
@@ -184,9 +192,9 @@ public class Box2D extends Pantalla {
             colisionBox2d = false;
 
             // ------------  si colisiona  avatar  contra una bola
-            if (fixture[ELEMENT_COLISION1] == fixture[AVATAR] && fixture[ELEMENT_COLISION2] != fixture[SUELO] && fixture[ELEMENT_COLISION2] != fixture[PARED_R] && fixture[ELEMENT_COLISION2] != fixture[PARED_L] && fixture[ELEMENT_COLISION2] != fixture[TECHO]) {
+            if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[AVATAR] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[SUELO] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[PARED_R] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[PARED_L] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[TECHO]) {
                 muerte();
-            } else if (fixture[ELEMENT_COLISION2] == fixture[AVATAR] && fixture[ELEMENT_COLISION1] != fixture[SUELO] && fixture[ELEMENT_COLISION1] != fixture[PARED_R] && fixture[ELEMENT_COLISION1] != fixture[PARED_L] && fixture[ELEMENT_COLISION1] != fixture[TECHO]) {
+            } else if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[AVATAR] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[SUELO] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[PARED_R] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[PARED_L] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[TECHO]) {
                 muerte();
             }//-------------   --------------------   -----------
 
@@ -200,7 +208,7 @@ public class Box2D extends Pantalla {
             disparo(false);
             setPuedoDisparar(false);
             if (tocoTecho) {
-                actoresArray[PAPEL].setPosition(0, -400); // oculramos el papel
+                actorArray[PAPEL].setPosition(0, -400); // oculramos el papel
                 tocoTecho = false;
                 puedoDisparar = true;
             }
@@ -232,15 +240,20 @@ public class Box2D extends Pantalla {
     public void dispose() {
 
         for (int i = 0; i < siguieteElemento; i++) {
-            body[i].destroyFixture(fixture[i]);
-            world.destroyBody(body[i]);
+            if (bodyArray[i] != null) {
+                bodyArray[i].destroyFixture(fixtureArray[i]);
+                world.destroyBody(bodyArray[i]);
+            }
+            if (   actorArray[i]!= null){
+                actorArray[i].remove();
+            }
         }
 
-        body[ELEMENT_COLISION1].destroyFixture(fixture[ELEMENT_COLISION1]);
-        body[ELEMENT_COLISION2].destroyFixture(fixture[ELEMENT_COLISION2]);
+        bodyArray[ELEMENT_COLISION1].destroyFixture(fixtureArray[ELEMENT_COLISION1]);
+        bodyArray[ELEMENT_COLISION2].destroyFixture(fixtureArray[ELEMENT_COLISION2]);
 
 
-        actoresArray[1].remove();
+
         shape.dispose();
         renderer.dispose();
         world.dispose();
@@ -256,8 +269,8 @@ public class Box2D extends Pantalla {
     }
 
 
-    public void setProcesadorIn(ProcesadorIn p) {
-        this.procesadorIn = p;
+    public void setProcesadorEntreda(ProcesadorEntreda p) {
+        this.procesadorEntreda = p;
     }
 
 
@@ -265,8 +278,8 @@ public class Box2D extends Pantalla {
 
     public void crearEscenario() {
 
-        actoresArray[siguieteElemento] = new ActorScene2d(textFondo, 64, 36, false);
-        stage.addActor(actoresArray[siguieteElemento]);
+        actorArray[siguieteElemento] = new ActorScene2d(textFondo, 64, 36, false);
+        stage.addActor(actorArray[siguieteElemento]);
         siguieteElemento = siguieteElemento + 1;
 
         shape = new PolygonShape();
@@ -282,15 +295,15 @@ public class Box2D extends Pantalla {
 
         for (int i = 0; i < 4; i++) {
             def.position.set(x[i], y[i]);
-            body[i] = world.createBody(def);
+            bodyArray[i] = world.createBody(def);
             shape.setAsBox(w[i], h[i]);
-            fixture[i] = body[i].createFixture(shape, 1);
+            fixtureArray[i] = bodyArray[i].createFixture(shape, 1);
 
             //filtros colision box2d
-            Filter filter = fixture[i].getFilterData();
+            Filter filter = fixtureArray[i].getFilterData();
             filter.categoryBits = CATEGORY_ESCENARIO;
             filter.maskBits = MASK_ESCENARIO;
-            fixture[i].setFilterData(filter);
+            fixtureArray[i].setFilterData(filter);
 
             siguieteElemento = siguieteElemento + 1;
         }
@@ -302,23 +315,23 @@ public class Box2D extends Pantalla {
 
         //izquierda
         BOTON_L = siguieteElemento;
-        actoresArray[siguieteElemento] = new ActorScene2d(textBotonL, 5, 5, false);
-        stage.addActor(actoresArray[siguieteElemento]);
-        actoresArray[siguieteElemento].setPosition(0, 5); // oculramos el papel
+        actorArray[siguieteElemento] = new ActorScene2d(textBotonL, 5, 5, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        actorArray[siguieteElemento].setPosition(0, 5); // oculramos el papel
         siguieteElemento = siguieteElemento + 1;
 
         //derecha
         BOTON_R = siguieteElemento;
-        actoresArray[siguieteElemento] = new ActorScene2d(textBotonR, 5, 5, false);
-        stage.addActor(actoresArray[siguieteElemento]);
-        actoresArray[siguieteElemento].setPosition(100, 5); // oculramos el papel
+        actorArray[siguieteElemento] = new ActorScene2d(textBotonR, 5, 5, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        actorArray[siguieteElemento].setPosition(100, 5); // oculramos el papel
         siguieteElemento = siguieteElemento + 1;
 
         //disparar
         BOTON_DISPARO = siguieteElemento;
-        actoresArray[siguieteElemento] = new ActorScene2d(textBotonDisparo, 5, 5, false);
-        stage.addActor(actoresArray[siguieteElemento]);
-        actoresArray[siguieteElemento].setPosition(550, 5); // oculramos el papel
+        actorArray[siguieteElemento] = new ActorScene2d(textBotonDisparo, 5, 5, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        actorArray[siguieteElemento].setPosition(550, 5); // oculramos el papel
         siguieteElemento = siguieteElemento + 1;
 
 
@@ -327,9 +340,9 @@ public class Box2D extends Pantalla {
     public void crearPapel() {
 
         PAPEL = siguieteElemento;
-        actoresArray[PAPEL] = new ActorScene2d(textPapel, 2f, 36, false);
-        stage.addActor(actoresArray[PAPEL]);
-        actoresArray[PAPEL].setPosition(0, -440); // ocultamos el papel debajo del suelo
+        actorArray[PAPEL] = new ActorScene2d(textPapel, 2f, 36, false);
+        stage.addActor(actorArray[PAPEL]);
+        actorArray[PAPEL].setPosition(0, -440); // ocultamos el papel debajo del suelo
         siguieteElemento = siguieteElemento + 1;
     }
 
@@ -348,7 +361,7 @@ public class Box2D extends Pantalla {
         shape = new PolygonShape();
         def.position.set(x + w, y + h);
         def.type = BodyDef.BodyType.DynamicBody;
-        body[siguieteElemento] = world.createBody(def);
+        bodyArray[siguieteElemento] = world.createBody(def);
 
         // almacenamos un array de vertices
         Vector2[] vertices = new Vector2[3];
@@ -359,18 +372,18 @@ public class Box2D extends Pantalla {
         //introducimos los vertices de la forma
         shape.set(vertices);
 
-        //creamos fixture
-        fixture[siguieteElemento] = body[siguieteElemento].createFixture(shape, 1000000);
+        //creamos fixtureArray
+        fixtureArray[siguieteElemento] = bodyArray[siguieteElemento].createFixture(shape, 1000000);
 
         // filtro colision box2d
-        Filter filter = fixture[siguieteElemento].getFilterData();
+        Filter filter = fixtureArray[siguieteElemento].getFilterData();
         filter.categoryBits = CATEGORY_AVATAR;
         filter.maskBits = MASK_AVATAR;
-        fixture[siguieteElemento].setFilterData(filter);
+        fixtureArray[siguieteElemento].setFilterData(filter);
 
         //creamos actor scene2d
-        actoresArray[siguieteElemento] = new ActorScene2d(textActorAvatar, 2f * w, 2f * h, false);
-        stage.addActor(actoresArray[siguieteElemento]);
+        actorArray[siguieteElemento] = new ActorScene2d(textActorAvatar, 2f * w, 2f * h, false);
+        stage.addActor(actorArray[siguieteElemento]);
 
 
         siguieteElemento = siguieteElemento + 1;
@@ -379,11 +392,9 @@ public class Box2D extends Pantalla {
 
         PIERNAS = siguieteElemento;
 
-        actoresArray[siguieteElemento] = new ActorScene2d(textPiernas, 4, 4, false);
-        stage.addActor(actoresArray[siguieteElemento]);
+        actorArray[siguieteElemento] = new ActorScene2d(textPiernas, 4, 4, false);
+        stage.addActor(actorArray[siguieteElemento]);
         siguieteElemento = siguieteElemento + 1;
-
-
 
 
     }
@@ -412,29 +423,29 @@ public class Box2D extends Pantalla {
 
         //creando bodys
         def.position.set(posX, posY);
-        body[numeroBola] = world.createBody(def);
+        bodyArray[numeroBola] = world.createBody(def);
 
         //creando fixtures
         circleShape.setRadius(radio);
-        fixture[numeroBola] = body[numeroBola].createFixture(circleShape, 1);
+        fixtureArray[numeroBola] = bodyArray[numeroBola].createFixture(circleShape, 1);
 
         //filtro colision box2d
-        Filter filter = fixture[numeroBola].getFilterData();
+        Filter filter = fixtureArray[numeroBola].getFilterData();
         filter.categoryBits = CATEGORY_BOLA;
         filter.maskBits = MASK_BOLA;
-        fixture[numeroBola].setFilterData(filter);
+        fixtureArray[numeroBola].setFilterData(filter);
 
         //conservamos la velocidad cunto choca el suelo
-        fixture[numeroBola].setFriction(0);
-        fixture[numeroBola].setRestitution(restitution);
+        fixtureArray[numeroBola].setFriction(0);
+        fixtureArray[numeroBola].setRestitution(restitution);
 
 
         //cremos los actores
-        actoresArray[numeroBola] = new ActorScene2d(texture, radio * 2f, radio * 2f, true);
-        stage.addActor(actoresArray[numeroBola]);
+        actorArray[numeroBola] = new ActorScene2d(texture, radio * 2f, radio * 2f, true);
+        stage.addActor(actorArray[numeroBola]);
 
         //impulso inicial
-        body[numeroBola].setLinearVelocity(velX, velY);
+        bodyArray[numeroBola].setLinearVelocity(velX, velY);
 
 
         siguieteElemento = siguieteElemento + 1;
@@ -446,26 +457,26 @@ public class Box2D extends Pantalla {
     private void actualizarPosicionActores() {
 
 
-        float w = actoresArray[AVATAR].getWidth() / 2;
-        float h = actoresArray[AVATAR].getHeight() / 2;
+        float w = actorArray[AVATAR].getWidth() / 2;
+        float h = actorArray[AVATAR].getHeight() / 2;
 
         ///avatar
-        float x = (body[AVATAR].getPosition().x * TO_PIXELES) - w;
-        float y = (body[AVATAR].getPosition().y * TO_PIXELES) - h;
-        actoresArray[AVATAR].setPosition(x, y);
-        //piernas
-        actoresArray[PIERNAS].setPosition(x, y -  actoresArray[PIERNAS].getHeight());
+        float x = (bodyArray[AVATAR].getPosition().x * TO_PIXELES) - w;
+        float y = (bodyArray[AVATAR].getPosition().y * TO_PIXELES) - h;
 
+        actorArray[AVATAR].setPosition(x, y);
+        //piernas
+        actorArray[PIERNAS].setPosition(x, y - actorArray[PIERNAS].getHeight());
 
 
         //viruses
         for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
 
-            w = actoresArray[i].getWidth() / 2;
-            h = actoresArray[i].getHeight() / 2;
-            x = (body[i].getPosition().x * TO_PIXELES) - w;
-            y = (body[i].getPosition().y * TO_PIXELES) - h;
-            actoresArray[i].setPosition(x, y);
+            w = actorArray[i].getWidth() / 2;
+            h = actorArray[i].getHeight() / 2;
+            x = (bodyArray[i].getPosition().x * TO_PIXELES) - w;
+            y = (bodyArray[i].getPosition().y * TO_PIXELES) - h;
+            actorArray[i].setPosition(x, y);
 
         }
 
@@ -481,19 +492,19 @@ public class Box2D extends Pantalla {
 
 
             // posicionPapel del rollo
-            float x = actoresArray[PAPEL].getX();
-            float y = actoresArray[PAPEL].getY();
+            float x = actorArray[PAPEL].getX();
+            float y = actorArray[PAPEL].getY();
 
             //comprobamos eje y
-            if (actoresArray[i].getY() < y + actoresArray[PAPEL].getHeight() && y < actoresArray[i].getY() + actoresArray[i].getHeight() && disparoIniciado && !tocoTecho) {
+            if (actorArray[i].getY() < y + actorArray[PAPEL].getHeight() && y < actorArray[i].getY() + actorArray[i].getHeight() && disparoIniciado && !tocoTecho) {
                 // //comprobamos eje x
-                float contacto = x - actoresArray[i].getX();
-                if (actoresArray[i].getWidth() > contacto && contacto > -actoresArray[PAPEL].getWidth() && actoresArray[i].isVivo()) {
+                float contacto = x - actorArray[i].getX();
+                if (actorArray[i].getWidth() > contacto && contacto > -actorArray[PAPEL].getWidth() && actorArray[i].isVivo()) {
 
                     romperBola(i);
 
                     //ocultamos el papel
-                    actoresArray[PAPEL].setPosition(actoresArray[PAPEL].getX(), -500);
+                    actorArray[PAPEL].setPosition(actorArray[PAPEL].getX(), -500);
                     tocoTecho = true;
                     disparoIniciado = false;
                     setPuedoDisparar(true);
@@ -513,10 +524,10 @@ public class Box2D extends Pantalla {
         //
         float reduccion = 2f;
         float radioMinimo = 0.5f;
-        float radio = fixture[i].getShape().getRadius();
-        float vel = fixture[i].getBody().getLinearVelocity().y;
+        float radio = fixtureArray[i].getShape().getRadius();
+        float vel = fixtureArray[i].getBody().getLinearVelocity().y;
         float nuevaVel;
-        Vector2 pos = fixture[i].getBody().getPosition();
+        Vector2 pos = fixtureArray[i].getBody().getPosition();
 
         if (Math.abs(vel) < 3) {
             nuevaVel = Math.abs(vel);
@@ -527,27 +538,27 @@ public class Box2D extends Pantalla {
         }
 
 
-        fixture[i].getShape().setRadius(radio / reduccion);
-        actoresArray[i].setX((radio / reduccion) * 2);
-        actoresArray[i].setY((radio / reduccion) * 2);
-        actoresArray[i].setSize(radio * 2 / reduccion * TO_PIXELES, radio * 2 / reduccion * TO_PIXELES);
+        fixtureArray[i].getShape().setRadius(radio / reduccion);
+        actorArray[i].setWidth((radio / reduccion) * 2);
+        actorArray[i].setHeigth((radio / reduccion) * 2);
+        actorArray[i].setSize(radio * 2 / reduccion * TO_PIXELES, radio * 2 / reduccion * TO_PIXELES);
         //impulso despues de romper
-        fixture[i].getBody().setLinearVelocity(velocidadInicialX, nuevaVel);
+        fixtureArray[i].getBody().setLinearVelocity(velocidadInicialX, nuevaVel);
         // velociodad nueva bola
-        crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, -velocidadInicialX, nuevaVel, 1f, actoresArray[i].getTexture());
+        crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, -velocidadInicialX, nuevaVel, 1f, actorArray[i].getTexture());
 
         //mata la bola
-        if (fixture[siguieteElemento - 1].getShape().getRadius() < radioMinimo) { // comprueba el tamaño de la bola para matar bola
+        if (fixtureArray[siguieteElemento - 1].getShape().getRadius() < radioMinimo) { // comprueba el tamaño de la bola para matar bola
 
             // matamos las 2 bolas
-            actoresArray[i].setVivo(false);
-            actoresArray[siguieteElemento - 1].setVivo(false);
+            actorArray[i].setVivo(false);
+            actorArray[siguieteElemento - 1].setVivo(false);
 
 
-            Filter filter = fixture[i].getFilterData();
+            Filter filter = fixtureArray[i].getFilterData();
             filter.maskBits = 000000000000000;
-            fixture[i].setFilterData(filter);
-            fixture[siguieteElemento - 1].setFilterData(filter);
+            fixtureArray[i].setFilterData(filter);
+            fixtureArray[siguieteElemento - 1].setFilterData(filter);
         }
     }
 
@@ -556,17 +567,17 @@ public class Box2D extends Pantalla {
 
 
         if (inicio) {
-            posicionPapel = actoresArray[AVATAR].getX() + actoresArray[AVATAR].getWidth() / 2 - actoresArray[PAPEL].getWidth() / 2;   //almacemanos la posicion del avatrar en el momento del diaparo
+            posicionPapel = actorArray[AVATAR].getX() + actorArray[AVATAR].getWidth() / 2 - actorArray[PAPEL].getWidth() / 2;   //almacemanos la posicion del avatrar en el momento del diaparo
             velocidadSubida = 50;                          //altuda desde la que empieza a sascender
             disparoIniciado = true;
 
-            actoresArray[PAPEL].setPosition(posicionPapel, velocidadSubida - actoresArray[PAPEL].getHeight());
+            actorArray[PAPEL].setPosition(posicionPapel, velocidadSubida - actorArray[PAPEL].getHeight());
 
-          sonidoDisparo.play();
+            sonidoDisparo.play();
 
         } else {
             velocidadSubida += 7;
-            actoresArray[PAPEL].setPosition(posicionPapel, velocidadSubida - actoresArray[PAPEL].getHeight());
+            actorArray[PAPEL].setPosition(posicionPapel, velocidadSubida - actorArray[PAPEL].getHeight());
 
             if (velocidadSubida > 700) {
                 tocoTecho = true;
@@ -588,51 +599,51 @@ public class Box2D extends Pantalla {
         //contacto entre bolas
         {
             for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
-                if (fixture[ELEMENT_COLISION1] == fixture[i]) {
+                if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[i]) {
                     for (int j = PRIMER_VIRUS; j < siguieteElemento; j++) {
-                        if (fixture[ELEMENT_COLISION2] == fixture[j]) {
+                        if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[j]) {
 
 
                             // comprueba el tamaño de las bolas
-                            if (fixture[i].getShape().getRadius() > radioMinimo) {
-                                radio = fixture[ELEMENT_COLISION1].getShape().getRadius();
-                                fixture[i].getShape().setRadius(radio / reduccion);
-                                actoresArray[i].setX((radio / reduccion) * 2);
-                                actoresArray[i].setY((radio / reduccion) * 2);
+                            if (fixtureArray[i].getShape().getRadius() > radioMinimo) {
+                                radio = fixtureArray[ELEMENT_COLISION1].getShape().getRadius();
+                                fixtureArray[i].getShape().setRadius(radio / reduccion);
+                                actorArray[i].setX((radio / reduccion) * 2);
+                                actorArray[i].setY((radio / reduccion) * 2);
 
 
-                                Vector2 vel = fixture[i].getBody().getLinearVelocity();
-                                Vector2 pos = fixture[i].getBody().getPosition();
+                                Vector2 vel = fixtureArray[i].getBody().getLinearVelocity();
+                                Vector2 pos = fixtureArray[i].getBody().getPosition();
                                 //        for (int k = 0; k < 5; k++) {
-                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, actoresArray[i].getTexture());
+                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, actorArray[i].getTexture());
                                 //       }
 
                             } else {
-                                fixture[i].getShape().setRadius(0.1f);
-                                actoresArray[i].setX(0.1f);
-                                actoresArray[i].setY(0.1f);
-                                fixture[i].setRestitution(0f);
+                                fixtureArray[i].getShape().setRadius(0.1f);
+                                actorArray[i].setX(0.1f);
+                                actorArray[i].setY(0.1f);
+                                fixtureArray[i].setRestitution(0f);
                             }
 
-                            if (fixture[j].getShape().getRadius() > radioMinimo) {
-                                radio = fixture[ELEMENT_COLISION2].getShape().getRadius();
-                                fixture[j].getShape().setRadius(radio / reduccion);
-                                actoresArray[j].setX((radio / reduccion) * 2);
-                                actoresArray[j].setY((radio / reduccion) * 2);
+                            if (fixtureArray[j].getShape().getRadius() > radioMinimo) {
+                                radio = fixtureArray[ELEMENT_COLISION2].getShape().getRadius();
+                                fixtureArray[j].getShape().setRadius(radio / reduccion);
+                                actorArray[j].setX((radio / reduccion) * 2);
+                                actorArray[j].setY((radio / reduccion) * 2);
 
-                                Vector2 vel = fixture[j].getBody().getLinearVelocity();
-                                Vector2 pos = fixture[j].getBody().getPosition();
+                                Vector2 vel = fixtureArray[j].getBody().getLinearVelocity();
+                                Vector2 pos = fixtureArray[j].getBody().getPosition();
                                 //          for (int k = 5; k < 5; k++) {
-                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, actoresArray[j].getTexture());
+                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, actorArray[j].getTexture());
 
                                 //        }
 
 
                             } else {
-                                fixture[j].getShape().setRadius(0.1f);
-                                actoresArray[j].setX(0.1f);
-                                actoresArray[j].setY(0.1f);
-                                fixture[j].setRestitution(0f);
+                                fixtureArray[j].getShape().setRadius(0.1f);
+                                actorArray[j].setX(0.1f);
+                                actorArray[j].setY(0.1f);
+                                fixtureArray[j].setRestitution(0f);
                             }
 
 
@@ -646,9 +657,9 @@ public class Box2D extends Pantalla {
 
     private void muerte() {
         if (!invencible) {
-            Filter filter = fixture[AVATAR].getFilterData();
+            Filter filter = fixtureArray[AVATAR].getFilterData();
             filter.maskBits = 000000000000110;
-            fixture[AVATAR].setFilterData(filter);
+            fixtureArray[AVATAR].setFilterData(filter);
 
 
         }
