@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -24,14 +26,24 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class Box2D extends Pantalla {
 
     public static final float TO_PIXELES = 10f;
-    public static int SUELO, PARED_R, TECHO, PARED_L, AVATAR, PAPEL, BOTON_L, BOTON_R, BOTON_DISPARO, PRIMER_VIRUS, ELEMENT_COLISION1 = 498, ELEMENT_COLISION2 = 499;
+    public static int SUELO, PARED_R, TECHO, PARED_L, AVATAR, PIERNAS, PAPEL, BOTON_L, BOTON_R, BOTON_DISPARO, PRIMER_VIRUS, ELEMENT_COLISION1 = 498, ELEMENT_COLISION2 = 499;
 
+    //FILTROS DE MCOLISION
+    private final short CATEGORY_ESCENARIO = 0000000000000001;
+    private final short CATEGORY_AVATAR = 0000000000000010;
+    private short CATEGORY_BOLA = 0000000000000100;
+
+    // activa colisiones
+    final short MASK_ESCENARIO = 0000000000000111;
+    final short MASK_AVATAR = 0000000000000111;
+    final short MASK_BOLA = 0000000000000011;
 
     //----------  scene2d  --------------
     private Stage stage;
-    private Texture textVirusVerde, textVirusRosa, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo;
+    private Texture textVirusVerde, textVirusRosa,textFondo, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo, textPiernas;
     private ActorScene2d[] actoresArray = new ActorScene2d[500];
-
+    private Sound sonidoBola, sonidoPedo, sonidoDisparo;
+    private Music musicaLaVida;
 
     //------------  box2d  ------------
     private World world;
@@ -46,17 +58,9 @@ public class Box2D extends Pantalla {
     private float velocidadInicialX = 10;
     private boolean colisionBox2d;
 
-    private Contact contactoBox2d;
+  private Contact contactoBox2d;
 
-    //FILTROS DE MCOLISION
-    private final short CATEGORY_ESCENARIO = 0000000000000001;
-    private final short CATEGORY_AVATAR = 0000000000000010;
-    private short CATEGORY_BOLA = 0000000000000100;
 
-    // activa colisiones
-    final short MASK_ESCENARIO = 0000000000000111;
-    final short MASK_AVATAR = 0000000000000111;
-    final short MASK_BOLA = 0000000000000011;
 
     //
     private boolean puedoDisparar = true;
@@ -97,17 +101,28 @@ public class Box2D extends Pantalla {
     public void show() {
 
 
-        stage = new Stage(new FitViewport(640, 360));
 
+        stage = new Stage(new FitViewport(640, 360));
         stage.setDebugAll(debugStage);  //marca bordes de objeto se debe dartamaño a los actores
 
-        textVirusVerde = new Texture("virusAmarillo100.png");
-        textVirusRosa = new Texture("virusRosa100.png");
-        textActorAvatar = new Texture("avatar300x100.png");
-        textPapel = new Texture("papelCulo100x3600.png");
-        textBotonL = new Texture("boton100pxL.png");
-        textBotonR = new Texture("boton100pxR.png");
-        textBotonDisparo = new Texture("boton100pxPapel.png");
+
+        textVirusVerde = juego.getManager().get("virusAmarillo100.png");
+        textVirusRosa = juego.getManager().get("virusRosa100.png");
+        textActorAvatar = juego.getManager().get("avatar300x100.png");
+        textPapel = juego.getManager().get("papelCulo100x3600.png");
+        textBotonL = juego.getManager().get("boton100pxL.png");
+        textBotonR = juego.getManager().get("boton100pxR.png");
+        textBotonDisparo = juego.getManager().get("boton100pxPapel.png");
+        textFondo = juego.getManager().get("Alameda.png");
+        textPiernas = juego.getManager().get("Patinete100px.png");
+
+        sonidoDisparo = juego.getManager().get("disparo.wav");
+        sonidoPedo = juego.getManager().get("pedo.wav");
+        musicaLaVida = juego.getManager().get("LaVidaEsAsi.mp3");
+
+        musicaLaVida.play();
+        musicaLaVida.setVolume(0.2f);
+        musicaLaVida.setLooping(true);
 
 
         // creamos world render y camara
@@ -120,7 +135,7 @@ public class Box2D extends Pantalla {
         camara.translate(32, 18);  //y = 8
 
         crearEscenario();
-        crearFixAvatar();
+        crearAvatar();
         crearPapel();
         creatBotones();
         crearBolasIniciales();
@@ -216,14 +231,17 @@ public class Box2D extends Pantalla {
     @Override
     public void dispose() {
 
-        for (int i = 0; i < body.length; i++) {
+        for (int i = 0; i < siguieteElemento; i++) {
             body[i].destroyFixture(fixture[i]);
             world.destroyBody(body[i]);
         }
 
+        body[ELEMENT_COLISION1].destroyFixture(fixture[ELEMENT_COLISION1]);
+        body[ELEMENT_COLISION2].destroyFixture(fixture[ELEMENT_COLISION2]);
+
+
+        actoresArray[1].remove();
         shape.dispose();
-
-
         renderer.dispose();
         world.dispose();
     }
@@ -246,6 +264,10 @@ public class Box2D extends Pantalla {
     //--- cear actores y fixtures --
 
     public void crearEscenario() {
+
+        actoresArray[siguieteElemento] = new ActorScene2d(textFondo, 64, 36, false);
+        stage.addActor(actoresArray[siguieteElemento]);
+        siguieteElemento = siguieteElemento + 1;
 
         shape = new PolygonShape();
 
@@ -311,7 +333,7 @@ public class Box2D extends Pantalla {
         siguieteElemento = siguieteElemento + 1;
     }
 
-    public void crearFixAvatar() {
+    public void crearAvatar() {
 
         AVATAR = siguieteElemento;
         //dimensiones en metros 2x6
@@ -352,6 +374,16 @@ public class Box2D extends Pantalla {
 
 
         siguieteElemento = siguieteElemento + 1;
+
+        // piernas
+
+        PIERNAS = siguieteElemento;
+
+        actoresArray[siguieteElemento] = new ActorScene2d(textPiernas, 4, 4, false);
+        stage.addActor(actoresArray[siguieteElemento]);
+        siguieteElemento = siguieteElemento + 1;
+
+
 
 
     }
@@ -421,6 +453,9 @@ public class Box2D extends Pantalla {
         float x = (body[AVATAR].getPosition().x * TO_PIXELES) - w;
         float y = (body[AVATAR].getPosition().y * TO_PIXELES) - h;
         actoresArray[AVATAR].setPosition(x, y);
+        //piernas
+        actoresArray[PIERNAS].setPosition(x, y -  actoresArray[PIERNAS].getHeight());
+
 
 
         //viruses
@@ -470,7 +505,10 @@ public class Box2D extends Pantalla {
 
     private void romperBola(int i) {
 
+        sonidoPedo.play();
+
         Gdx.input.vibrate(100);
+
 
         //
         float reduccion = 2f;
@@ -523,6 +561,9 @@ public class Box2D extends Pantalla {
             disparoIniciado = true;
 
             actoresArray[PAPEL].setPosition(posicionPapel, velocidadSubida - actoresArray[PAPEL].getHeight());
+
+          sonidoDisparo.play();
+
         } else {
             velocidadSubida += 7;
             actoresArray[PAPEL].setPosition(posicionPapel, velocidadSubida - actoresArray[PAPEL].getHeight());
@@ -608,6 +649,8 @@ public class Box2D extends Pantalla {
             Filter filter = fixture[AVATAR].getFilterData();
             filter.maskBits = 000000000000110;
             fixture[AVATAR].setFilterData(filter);
+
+
         }
 
     }
