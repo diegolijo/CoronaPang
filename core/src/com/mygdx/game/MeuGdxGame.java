@@ -2,7 +2,6 @@ package com.mygdx.game;
 
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -12,23 +11,27 @@ import com.badlogic.gdx.graphics.Texture;
 public class MeuGdxGame extends Game {
 
     private int SO;
+    AssetManager manager;
+
+    //pantallas
+    private EscenarioScreen escenarioScreen;
+    private GameOverScreen gameOverScreen;
+
+    public EscenarioScreen getEscenarioScreen() {
+        return escenarioScreen;
+    }
+
+    public GameOverScreen getGameOverScreen() {
+        return gameOverScreen;
+    }
 
     public MeuGdxGame(int SO) {
-        this.SO= SO;
+        this.SO = SO;
     }
 
     public int getSO() {
         return SO;
     }
-
-
-
-
-    AssetManager manager;
-
-
-
-
 
 
     public AssetManager getManager() {
@@ -38,7 +41,7 @@ public class MeuGdxGame extends Game {
     @Override
     public void create() {
 
-      System.out.println(this.getClass().getClassLoader().getParent().toString());
+        System.out.println(this.getClass().getClassLoader().getParent().toString());
 
         manager = new AssetManager();
         manager.load("virusAmarillo100.png", Texture.class);
@@ -50,24 +53,21 @@ public class MeuGdxGame extends Game {
         manager.load("boton100pxPapel.png", Texture.class);
         manager.load("Alameda.png", Texture.class);
         manager.load("Patinete100px.png", Texture.class);
+        manager.load("GameOver.png", Texture.class);
 
-        manager.load("disparo.wav", Sound.class);
-        manager.load("pedo.wav", Sound.class);
-        manager.load ("LaVidaEsAsi.mp3", Music.class);
+
+        manager.load("audio/disparo.wav", Sound.class);
+        manager.load("audio/pedo.wav", Sound.class);
+        manager.load("audio/LaVidaEsAsi.mp3", Music.class);
         manager.finishLoading();
 
 
-        //creamos una pantalla box2dScene2D le mandanmos la referencia al juego
-        Box2d_Scene2d box2dScene2D = new Box2d_Scene2d(this, 5);
-        setScreen(box2dScene2D);
+        //inicializamos pantallas
+        escenarioScreen = new EscenarioScreen(this, 5);
+        gameOverScreen = new GameOverScreen(this);
 
-        //creamos un imputProcesora  le mandanmos la referencia a las pantalla box2dScene2D
-        ProcesadorEntreda p = new ProcesadorEntreda(box2dScene2D);
-        Gdx.input.setInputProcessor(p);
-
-        //le pasamos el procesador de entrada
-    //    box2dScene2D.setProcesadorEntreda(p);
-
+        setScreen(escenarioScreen);
+        //   setScreen(gameOverScreen);
 
     }
 
@@ -79,5 +79,10 @@ public class MeuGdxGame extends Game {
     @Override
     public void dispose() {
 
+    }
+
+
+    public void gameOver() {
+        escenarioScreen.dispose();
     }
 }

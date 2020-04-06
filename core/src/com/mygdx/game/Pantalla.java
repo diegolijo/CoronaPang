@@ -1,11 +1,13 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
-public abstract class Pantalla implements Screen {
+public abstract class Pantalla extends Stage implements Screen {
 
 
     protected MeuGdxGame juego;
+    public static final float TO_PIXELES = 10f;
 
     public Pantalla(MeuGdxGame juego) {
         this.juego = juego;

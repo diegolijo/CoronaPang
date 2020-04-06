@@ -3,26 +3,24 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-import static com.mygdx.game.Box2d_Scene2d.*;
+import static com.mygdx.game.EscenarioScreen.*;
 
 
 // implementa la interface InputProcessor;
-public class ProcesadorEntreda extends InputAdapter {
+public class ProcesadorInEscenario extends InputAdapter {
 
-    private Box2d_Scene2d box2dScene2D;
+    private EscenarioScreen box2dScene2D;
     private Fixture fixtureAvatar;
     private boolean isTouchL = false, isTouchR = false, puedoDisparar = true;
     private int xL, xR,  Lw,buttonR,buttonL;
     private int velocidadAvatar = 20;
-    private Vector2 ultimoTouch = new Vector2();
 
 
 
 
-    public ProcesadorEntreda(Box2d_Scene2d box2dScene2D) {
+    public ProcesadorInEscenario(EscenarioScreen box2dScene2D) {
         this.box2dScene2D = box2dScene2D;
     }
 

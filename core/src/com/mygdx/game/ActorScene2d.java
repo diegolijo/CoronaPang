@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import static com.mygdx.game.Box2d_Scene2d.TO_PIXELES;
+import static com.mygdx.game.Pantalla.TO_PIXELES;
+
 
 public class ActorScene2d extends Actor {
 
@@ -15,7 +16,9 @@ public class ActorScene2d extends Actor {
     private float heigth;
 
 
-    public ActorScene2d(Texture avatar,  float width, float heigth,boolean vivo) {
+
+
+    public ActorScene2d(Texture avatar, float width, float heigth, boolean vivo) {
         this.texture = avatar;
    //     this.sprite = new Sprite(texture);
         this.width = width;

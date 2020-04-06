@@ -23,9 +23,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 
-public class Box2d_Scene2d extends Pantalla {
+public class EscenarioScreen extends Pantalla {
 
-    public static final float TO_PIXELES = 10f;
     public static int SUELO, PARED_R, TECHO, PARED_L, AVATAR, PIERNAS, PAPEL, BOTON_L, BOTON_R, BOTON_DISPARO, PRIMER_VIRUS, ELEMENT_COLISION1 = 498, ELEMENT_COLISION2 = 499;
 
     //FILTROS DE MCOLISION
@@ -65,198 +64,27 @@ public class Box2d_Scene2d extends Pantalla {
     private boolean puedoDisparar = true;
     private boolean disparoIniciado, tocoTecho, papelUsado = false;
 
-    //---------  Procesador  ------------
-    ProcesadorEntreda procesadorEntreda;
-
 
     // ------------  fuses -------------
     private int numBolas;
-    private boolean camaraBox2d = true, debugStage = true, invencible = true;
+    private boolean camaraBox2d = false, debugStage = false, invencible = false;
     private int velocidadSubida;
     private float posicionPapel;
 
 
-    public Box2d_Scene2d(MeuGdxGame juego, int numBolas) {
+    public EscenarioScreen(MeuGdxGame juego, int numBolas) {
         super(juego);
 
         this.numBolas = numBolas;
         fixtureArray[ELEMENT_COLISION1] = null;
         fixtureArray[ELEMENT_COLISION2] = null;
 
-    }
 
+    }
 
 
     public Fixture getFixtureArray(int indice) {
         return fixtureArray[indice];
-    }
-
-    public ActorScene2d getActorArray(int indice) {
-        return actorArray[indice];
-    }
-
-
-    @Override
-    public void show() {
-
-        
-        if (juego.getSO() == 0) {
-            //android
-        }
-        if (juego.getSO() == 1) {
-            //desktop
-        }
-
-
-
-        stage = new Stage(new FitViewport(640, 360));
-        stage.setDebugAll(debugStage);  //marca bordes de objeto
-
-
-        textVirusVerde = juego.getManager().get("virusAmarillo100.png");
-        textVirusRosa = juego.getManager().get("virusRosa100.png");
-        textActorAvatar = juego.getManager().get("avatar300x100.png");
-        textPapel = juego.getManager().get("papelCulo100x3600.png");
-        textBotonL = juego.getManager().get("boton100pxL.png");
-        textBotonR = juego.getManager().get("boton100pxR.png");
-        textBotonDisparo = juego.getManager().get("boton100pxPapel.png");
-        textFondo = juego.getManager().get("Alameda.png");
-        textPiernas = juego.getManager().get("Patinete100px.png");
-
-        sonidoDisparo = juego.getManager().get("disparo.wav");
-        sonidoPedo = juego.getManager().get("pedo.wav");
-        musicaLaVida = juego.getManager().get("LaVidaEsAsi.mp3");
-
-        musicaLaVida.play();
-        musicaLaVida.setVolume(0.2f);
-        musicaLaVida.setLooping(true);
-
-
-        // creamos world render y camara
-        world = new World(new Vector2(0, -9.8f), true);
-
-        world.setGravity(new Vector2(0, -40f));                 // aumentamos velocidad de la caida
-
-        renderer = new Box2DDebugRenderer();
-        camara = new OrthographicCamera(64, 36);
-        camara.translate(32, 18);  //y = 8
-
-        crearEscenario();
-        crearAvatar();
-        crearPapel();
-        creatBotones();
-        crearBolasIniciales();
-
-
-        world.setContactListener(new ContactListener() {
-
-            @Override
-            public void beginContact(Contact contact) {
-                //almacena en las posiciones ELEMENT_COLISION1,ELEMENT_COLISION2 las fixtureArray en contacto
-                fixtureArray[ELEMENT_COLISION1] = contact.getFixtureA();
-                fixtureArray[ELEMENT_COLISION2] = contact.getFixtureB();
-                contactoBox2d = contact;
-                colisionBox2d = true;
-            }
-
-
-            @Override
-            public void endContact(Contact contact) {
-
-            }
-
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
-
-            }
-
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
-
-            }
-        });
-
-
-    }
-
-
-
-    @Override
-    public void render(float delta) {
-
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-
-        if (colisionBox2d) {  // -----  entra si se produgo una colision Box2d
-            colisionBox2d = false;
-
-            // ------------  si colisiona  avatar  contra una bola
-            if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[AVATAR] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[SUELO] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[PARED_R] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[PARED_L] && fixtureArray[ELEMENT_COLISION2] != fixtureArray[TECHO]) {
-                muerte();
-            } else if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[AVATAR] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[SUELO] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[PARED_R] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[PARED_L] && fixtureArray[ELEMENT_COLISION1] != fixtureArray[TECHO]) {
-                muerte();
-            }//-------------   --------------------   -----------
-
-
-        }//----------------------------------------------------------------------------------------------------------------------------------
-
-        actualizarPosicionActores();
-
-
-        if (disparoIniciado) {
-            disparo(false);
-            setPuedoDisparar(false);
-            if (tocoTecho) {
-                actorArray[PAPEL].setPosition(0, -400); // oculramos el papel
-                tocoTecho = false;
-                puedoDisparar = true;
-            }
-        }
-
-        colisionPapel();
-
-
-        stage.act();
-        stage.draw();
-        world.step(delta, 6, 2);
-
-        if (camaraBox2d) {
-            camara.update();
-            renderer.render(world, camara.combined);
-
-        }
-
-
-    }
-
-
-    @Override
-    public void hide() {
-        super.hide();
-    }
-
-    @Override
-    public void dispose() {
-
-        for (int i = 0; i < siguieteElemento; i++) {
-            if (bodyArray[i] != null) {
-                bodyArray[i].destroyFixture(fixtureArray[i]);
-                world.destroyBody(bodyArray[i]);
-            }
-            if (   actorArray[i]!= null){
-                actorArray[i].remove();
-            }
-        }
-
-        bodyArray[ELEMENT_COLISION1].destroyFixture(fixtureArray[ELEMENT_COLISION1]);
-        bodyArray[ELEMENT_COLISION2].destroyFixture(fixtureArray[ELEMENT_COLISION2]);
-
-
-
-        shape.dispose();
-        renderer.dispose();
-        world.dispose();
     }
 
 
@@ -269,13 +97,7 @@ public class Box2d_Scene2d extends Pantalla {
     }
 
 
-    public void setProcesadorEntreda(ProcesadorEntreda p) {
-        this.procesadorEntreda = p;
-    }
-
-
     //--- cear actores y fixtures --
-
     public void crearEscenario() {
 
         actorArray[siguieteElemento] = new ActorScene2d(textFondo, 64, 36, false);
@@ -495,20 +317,23 @@ public class Box2d_Scene2d extends Pantalla {
             float x = actorArray[PAPEL].getX();
             float y = actorArray[PAPEL].getY();
 
-            //comprobamos eje y
-            if (actorArray[i].getY() < y + actorArray[PAPEL].getHeight() && y < actorArray[i].getY() + actorArray[i].getHeight() && disparoIniciado && !tocoTecho) {
-                // //comprobamos eje x
-                float contacto = x - actorArray[i].getX();
-                if (actorArray[i].getWidth() > contacto && contacto > -actorArray[PAPEL].getWidth() && actorArray[i].isVivo()) {
+            if (actorArray[i].isVivo() && disparoIniciado && !tocoTecho) {
 
-                    romperBola(i);
+                //comprobamos eje y, si el actor se encuentra entre el limete superior e inferior del papel
+                if (actorArray[i].getY() < y + actorArray[PAPEL].getHeight() && y < actorArray[i].getY() + actorArray[i].getHeight()) {
+                    // //comprobamos eje x
+                    float distanciaX = x - actorArray[i].getX();
+                    if (actorArray[i].getWidth() > distanciaX && distanciaX > -actorArray[PAPEL].getWidth()) {
 
-                    //ocultamos el papel
-                    actorArray[PAPEL].setPosition(actorArray[PAPEL].getX(), -500);
-                    tocoTecho = true;
-                    disparoIniciado = false;
-                    setPuedoDisparar(true);
+                        romperBola(i);
 
+                        //ocultamos el papel
+                        actorArray[PAPEL].setPosition(actorArray[PAPEL].getX(), -500);
+                        tocoTecho = true;
+                        disparoIniciado = false;
+                        setPuedoDisparar(true);
+
+                    }
                 }
             }
         }
@@ -661,16 +486,213 @@ public class Box2d_Scene2d extends Pantalla {
             filter.maskBits = 000000000000110;
             fixtureArray[AVATAR].setFilterData(filter);
 
+            //disparar musica de muerte
+            // esperar 2 segundos
+
+      /*      juego.gameOver();
+
+            juego.setScreen(juego.getGameOverScreen());*/
 
         }
 
     }
 
+//-------------------------------------------------------------------------------------------------------------------------------
+    @Override
+    public void show() {
+
+
+        //creamos un imputProcesor  le mandanmos la referencia de esta pantalla
+        ProcesadorInEscenario p = new ProcesadorInEscenario(this);
+        Gdx.input.setInputProcessor(p);
+
+
+        if (juego.getSO() == 0) {
+            //android
+        }
+        if (juego.getSO() == 1) {
+            //desktop
+        }
+
+
+        stage = new Stage(new FitViewport(640, 360));
+        stage.setDebugAll(debugStage);  //marca bordes de objeto
+
+
+        textVirusVerde = juego.getManager().get("virusAmarillo100.png");
+        textVirusRosa = juego.getManager().get("virusRosa100.png");
+        textActorAvatar = juego.getManager().get("avatar300x100.png");
+        textPapel = juego.getManager().get("papelCulo100x3600.png");
+        textBotonL = juego.getManager().get("boton100pxL.png");
+        textBotonR = juego.getManager().get("boton100pxR.png");
+        textBotonDisparo = juego.getManager().get("boton100pxPapel.png");
+        textFondo = juego.getManager().get("Alameda.png");
+        textPiernas = juego.getManager().get("Patinete100px.png");
+
+        sonidoDisparo = juego.getManager().get("audio/disparo.wav");
+        sonidoPedo = juego.getManager().get("audio/pedo.wav");
+        musicaLaVida = juego.getManager().get("audio/LaVidaEsAsi.mp3");
+
+        musicaLaVida.play();
+        musicaLaVida.setVolume(0.2f);
+        musicaLaVida.setLooping(true);
+
+
+        // creamos world render y camara
+        world = new World(new Vector2(0, -9.8f), true);
+
+        world.setGravity(new Vector2(0, -40f));                 // aumentamos gravedad
+
+        renderer = new Box2DDebugRenderer();
+        camara = new OrthographicCamera(64, 36);
+        camara.translate(32, 18);  //y = 8
+
+        crearEscenario();
+        crearAvatar();
+        crearPapel();
+        creatBotones();
+        crearBolasIniciales();
+
+
+        world.setContactListener(new ContactListener() {
+
+            @Override
+            public void beginContact(Contact contact) {
+                //almacena en las posiciones ELEMENT_COLISION1,ELEMENT_COLISION2 las fixtureArray en contacto
+                fixtureArray[ELEMENT_COLISION1] = contact.getFixtureA();
+                fixtureArray[ELEMENT_COLISION2] = contact.getFixtureB();
+                contactoBox2d = contact;
+                colisionBox2d = true;
+            }
+
+
+            @Override
+            public void endContact(Contact contact) {
+
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+
+            }
+        });
+
+
+    }
+
+    @Override
+    public void render(float delta) {
+
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+
+        if (colisionBox2d) {  // -----  entra si se produjo una colision Box2d
+            colisionBox2d = false;
+
+
+            // ------------  si colisiona  avatar  contra una bola
+            if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[AVATAR]) {
+
+                for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
+                    if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[i]) {
+                        muerte();
+                    }
+                }
+            }
+            if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[AVATAR]) {
+
+                for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
+                    if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[i]) {
+                        muerte();
+                    }
+                }
+            }
+
+
+        }//----------------------------------------------------------------
+
+        actualizarPosicionActores();
+
+
+        if (disparoIniciado) {
+            disparo(false);
+            setPuedoDisparar(false);
+            if (tocoTecho) {
+                actorArray[PAPEL].setPosition(0, -400); // oculramos el papel
+                tocoTecho = false;
+                puedoDisparar = true;
+            }
+        }
+
+        colisionPapel();
+
+
+        stage.act();
+        stage.draw();
+        world.step(delta, 6, 2);
+
+        if (camaraBox2d) {
+            camara.update();
+            renderer.render(world, camara.combined);
+
+        }
+
+
+    }
+
+    @Override
+    public void hide() {
+
+  /*      super.hide();
+        super.dispose();
+
+        Gdx.input.setInputProcessor(null);
+
+        for (int i = 0; i < siguieteElemento; i++) {
+            if (bodyArray[i] != null) {
+                bodyArray[i].destroyFixture(fixtureArray[i]);
+                world.destroyBody(bodyArray[i]);
+            }
+            if (actorArray[i] != null) {
+                actorArray[i].remove();
+            }
+        }
+*//*
+        fixtureArray[ELEMENT_COLISION1].getBody().destroyFixture(fixtureArray[ELEMENT_COLISION1]);
+        fixtureArray[ELEMENT_COLISION2].getBody().destroyFixture(fixtureArray[ELEMENT_COLISION2]);
+*//*
+        shape.dispose();
+        renderer.dispose();
+        world.dispose();*/
+
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        Gdx.input.setInputProcessor(null);
+
+        for (int i = 0; i < siguieteElemento; i++) {
+            if (bodyArray[i] != null) {
+                bodyArray[i].destroyFixture(fixtureArray[i]);
+                world.destroyBody(bodyArray[i]);
+            }
+            if (actorArray[i] != null) {
+                actorArray[i].remove();
+            }
+        }
+
+        shape.dispose();
+        renderer.dispose();
+        world.dispose();
+    }
 }
-
-
-
-
-
-
+//--------------------------------------------------------------------------------------------------------------------------------
 
