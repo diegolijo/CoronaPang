@@ -388,6 +388,7 @@ public class EscenarioScreen extends Pantalla {
     }
 
 
+
     public void disparo(boolean inicio) {
 
 
