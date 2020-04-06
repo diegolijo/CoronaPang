@@ -63,7 +63,7 @@ public class MeuGdxGame extends Game {
 
 
         //inicializamos pantallas
-        escenarioScreen = new EscenarioScreen(this, 5);
+        escenarioScreen = new EscenarioScreen(this, 2);
         gameOverScreen = new GameOverScreen(this);
 
         setScreen(escenarioScreen);

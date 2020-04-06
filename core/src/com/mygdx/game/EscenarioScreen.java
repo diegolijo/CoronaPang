@@ -231,7 +231,7 @@ public class EscenarioScreen extends Pantalla {
 
         for (int i = 0; i < numBolas; i++) {
 
-            crearBola(siguieteElemento, radio[i], x[i], y, velocidadInicialX * 5, 0, 1, textVirusVerde);
+            crearBola(siguieteElemento, radio[i], x[i], y, velocidadInicialX , 0, 1, textVirusVerde);
 
 
         }
