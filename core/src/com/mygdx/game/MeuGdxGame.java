@@ -15,15 +15,15 @@ public class MeuGdxGame extends Game {
 
     //pantallas
     private EscenarioScreen escenarioScreen;
-    private GameOverScreen gameOverScreen;
+
+    //pantallas
+    private GameOverScreen  gameOverScreen;
+
 
     public EscenarioScreen getEscenarioScreen() {
         return escenarioScreen;
     }
 
-    public GameOverScreen getGameOverScreen() {
-        return gameOverScreen;
-    }
 
     public MeuGdxGame(int SO) {
         this.SO = SO;
@@ -54,6 +54,7 @@ public class MeuGdxGame extends Game {
         manager.load("Alameda.png", Texture.class);
         manager.load("Patinete100px.png", Texture.class);
         manager.load("GameOver.png", Texture.class);
+        manager.load("Logo2.png", Texture.class);
 
 
         manager.load("audio/disparo.wav", Sound.class);
@@ -63,11 +64,21 @@ public class MeuGdxGame extends Game {
 
 
         //inicializamos pantallas
-        escenarioScreen = new EscenarioScreen(this, 2);
-        gameOverScreen = new GameOverScreen(this);
+        //    escenarioScreen = new EscenarioScreen(this, 2);
 
-        setScreen(escenarioScreen);
-        //   setScreen(gameOverScreen);
+        //setScreen(gameOverScreen);
+
+
+
+        MenuPrincipal menu = new MenuPrincipal(this);
+        setScreen(menu);
+
+/*
+        gameOverScreen = new GameOverScreen(this);
+        setScreen(gameOverScreen);
+*/
+
+
 
     }
 
@@ -82,7 +93,4 @@ public class MeuGdxGame extends Game {
     }
 
 
-    public void gameOver() {
-        escenarioScreen.dispose();
-    }
 }

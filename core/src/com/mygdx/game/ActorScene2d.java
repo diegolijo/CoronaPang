@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import static com.mygdx.game.Pantalla.TO_PIXELES;
+import static com.mygdx.game.Pantallas.TO_PIXELES;
 
 
 public class ActorScene2d extends Actor {

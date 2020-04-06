@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 
-public class GameOverScreen extends Pantalla {
+public class GameOverScreen extends Pantallas {
 
     private Stage stage;
     private Image gameOver;
@@ -32,10 +32,10 @@ public class GameOverScreen extends Pantalla {
         gameOver = new Image(juego.getManager().get("GameOver.png", Texture.class));
         gameOver.setWidth(200);
         gameOver.setHeight(150);
-        gameOver.setPosition(320 - gameOver.getWidth()/ 2, 360 - gameOver.getHeight());
+        gameOver.setPosition(320 - gameOver.getWidth()/ 2, 180 - gameOver.getHeight()/2);
 
         boton = new TextButton("Continuar", skin);
-        boton.setPosition(320 - boton.getWidth()/ 2, 150);
+        boton.setPosition(320 - boton.getWidth()/ 2, 50);
 
         stage.addActor(boton);
         stage.addActor(gameOver);
@@ -44,7 +44,7 @@ public class GameOverScreen extends Pantalla {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 //pulsamos el boton
-                juego.setScreen( juego.getEscenarioScreen());
+                juego.setScreen(new EscenarioScreen(juego, 2));
             }
         });
     }
