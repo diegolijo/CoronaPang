@@ -13,12 +13,10 @@ public class MeuGdxGame extends Game {
     private int SO;
     AssetManager manager;
 
+
     //pantallas
     private EscenarioScreen escenarioScreen;
-
-    //pantallas
     private GameOverScreen  gameOverScreen;
-
     private MenuPrincipal menuScreen ;
 
 
@@ -71,22 +69,10 @@ public class MeuGdxGame extends Game {
         manager.finishLoading();
 
 
-        //inicializamos pantallas
-        //    escenarioScreen = new EscenarioScreen(this, 2);
-
-        //setScreen(gameOverScreen);
-
-
 
          menuScreen = new MenuPrincipal(this);
         setScreen(menuScreen);
 
-
-
-/*
-        gameOverScreen = new GameOverScreen(this);
-        setScreen(gameOverScreen);
-*/
 
 
 

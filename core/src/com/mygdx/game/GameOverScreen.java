@@ -49,17 +49,14 @@ public class GameOverScreen extends Pantallas {
         stage.addActor(gameOver);
 
 
-     //   Gdx.input.setInputProcessor(stage);
-
-        juego.setScreen(new EscenarioScreen(juego, 10));
-        System.out.println("22fszfdghxfghxfghjxfgt");
+        Gdx.input.setInputProcessor(stage);
 
 
         boton.addCaptureListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 //pulsamos el boton
-               // juego.setScreen(new EscenarioScreen(juego, 2));
+               juego.setScreen(juego.getMenuScreen());
             }
         });
     }

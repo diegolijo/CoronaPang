@@ -49,15 +49,17 @@ public class EscenarioScreen extends Pantallas {
 
     private Contact contactoBox2d;
 
+    //pantallas
 
-    //
+
+    // bandera
     private boolean puedoDisparar = true;
     private boolean disparoIniciado, tocoTecho, papelUsado = false;
 
 
     // ------------  fuses -------------
     private int numBolas;
-    private boolean camaraBox2d = false, debugStage = false, invencible = false;
+    private boolean camaraBox2d = true, debugStage = false, invencible = false;
     private int velocidadSubida;
     private float posicionPapel;
     private boolean dispose = true;
@@ -221,6 +223,7 @@ public class EscenarioScreen extends Pantallas {
 
             }
 
+
         }
     }
 
@@ -255,7 +258,7 @@ public class EscenarioScreen extends Pantallas {
     public void dispose() {
         super.dispose();
 
-        Gdx.input.setInputProcessor(null);
+        //    Gdx.input.setInputProcessor(null);
 
         for (int i = 0; i < siguieteElemento; i++) {
             if (bodyArray[i] != null) {
@@ -424,7 +427,7 @@ public class EscenarioScreen extends Pantallas {
         PRIMER_VIRUS = siguieteElemento;
 
 
-        float[] radio = {4, 2.5f, 2f, 1.2f, 2.1f, 2, 2, 2, 3, 3};
+   /*     float[] radio = {4, 2.5f, 2f, 1.2f, 2.1f, 2, 2, 2, 3, 3};
         int[] x = {2, 3, 4, 5, 6, 50, 55, -3, 0, 1};
         int y = 17;
 
@@ -433,6 +436,11 @@ public class EscenarioScreen extends Pantallas {
             crearBola(siguieteElemento, radio[i], x[i], y, velocidadInicialX, 0, 1, textVirusVerde);
 
 
+        }*/
+
+        for (int i = 0; i < numBolas; i++) {
+            int x = (int) (Math.random() *20);
+            crearBola(siguieteElemento, (int)(Math.random() * 2)+0.5f, x, 18, velocidadInicialX, 0, 1, textVirusVerde);
         }
     }
 
@@ -463,6 +471,7 @@ public class EscenarioScreen extends Pantallas {
 
         //cremos los actores
         actorArray[numeroBola] = new ActorScene2d(texture, radio * 2f, radio * 2f, true);
+        actorArray[numeroBola].setVivo(true);
         stage.addActor(actorArray[numeroBola]);
 
         //impulso inicial
@@ -575,6 +584,22 @@ public class EscenarioScreen extends Pantallas {
             fixtureArray[i].setFilterData(filter);
             fixtureArray[siguieteElemento - 1].setFilterData(filter);
         }
+
+
+        //----------------------- comprueba se se rompieron todas la bolas -------------------------
+        int bolas = siguieteElemento - PRIMER_VIRUS;
+        for (int j = PRIMER_VIRUS; j < siguieteElemento ; j++) {
+            if (!actorArray[j].isVivo()) {
+                bolas -= 1;
+            }
+
+            if (bolas ==0) {
+                siguiente();
+            }
+
+        }
+
+
     }
 
 
@@ -668,6 +693,33 @@ public class EscenarioScreen extends Pantallas {
                 }
             }
         }
+    }
+
+    private void siguiente() {
+
+
+        musicaLaVida.stop();
+        //disparar musica de muerte
+        // esperar 2 segundos
+        dispose = false;
+
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+
+                //     menuScreen.set
+                juego.setScreen(juego.getMenuScreen());
+
+                dispose();
+
+                juego.getMenuScreen().siguienteNivel();
+
+
+            }
+        }, 1);
+
+
     }
 
 

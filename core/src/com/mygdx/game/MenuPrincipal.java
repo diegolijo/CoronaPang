@@ -21,6 +21,15 @@ public class MenuPrincipal extends Pantallas {
     //
     EscenarioScreen escenarioScreen;
 
+    private int nivel = 1;
+
+
+    public void siguienteNivel() {
+        this.nivel = nivel + 1;
+        escenarioScreen = new EscenarioScreen(juego, nivel);
+        juego.setScreen(escenarioScreen);
+    }
+
     public MenuPrincipal(final MeuGdxGame juego) {
         super(juego);
         this.juego = juego;
@@ -48,8 +57,10 @@ public class MenuPrincipal extends Pantallas {
             public void changed(ChangeEvent event, Actor actor) {
                 //pulsamos el boton
 
-                escenarioScreen = new EscenarioScreen(juego, 2);
+                escenarioScreen = new EscenarioScreen(juego, nivel);
                 juego.setScreen(escenarioScreen);
+
+
 
 
             }
