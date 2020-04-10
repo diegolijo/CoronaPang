@@ -60,7 +60,7 @@ public class EscenarioScreen extends Pantallas {
     private boolean camaraBox2d = false, debugStage = false, invencible = false;
     private int velocidadSubida;
     private float posicionPapel;
-
+    private boolean dispose = true;
 
 
     public EscenarioScreen(MeuGdxGame juego, int numBolas) {
@@ -166,59 +166,62 @@ public class EscenarioScreen extends Pantallas {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-
-        if (colisionBox2d) {  // -----  entra si se produjo una colision Box2d
-            colisionBox2d = false;
+        if (dispose) {
 
 
-            // ------------  si colisiona  avatar  contra una bola
-            if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[AVATAR]) {
+            if (colisionBox2d) {  // -----  entra si se produjo una colision Box2d
+                colisionBox2d = false;
 
-                for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
-                    if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[i]) {
-                        muerte();
+
+                // ------------  si colisiona  avatar  contra una bola
+                if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[AVATAR]) {
+
+                    for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
+                        if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[i]) {
+                            muerte();
+                        }
                     }
                 }
-            }
-            if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[AVATAR]) {
+                if (fixtureArray[ELEMENT_COLISION2] == fixtureArray[AVATAR]) {
 
-                for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
-                    if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[i]) {
-                        muerte();
+                    for (int i = PRIMER_VIRUS; i < siguieteElemento; i++) {
+                        if (fixtureArray[ELEMENT_COLISION1] == fixtureArray[i]) {
+                            muerte();
+                        }
                     }
+                }
+
+
+            }//----------------------------------------------------------------
+
+            actualizarPosicionActores();
+
+
+            if (disparoIniciado) {
+                disparo(false);
+                setPuedoDisparar(false);
+                if (tocoTecho) {
+                    actorArray[PAPEL].setPosition(0, -400); // oculramos el papel
+                    tocoTecho = false;
+                    puedoDisparar = true;
                 }
             }
 
-
-        }//----------------------------------------------------------------
-
-        actualizarPosicionActores();
+            colisionPapel();
 
 
-        if (disparoIniciado) {
-            disparo(false);
-            setPuedoDisparar(false);
-            if (tocoTecho) {
-                actorArray[PAPEL].setPosition(0, -400); // oculramos el papel
-                tocoTecho = false;
-                puedoDisparar = true;
+            stage.act();
+            stage.draw();
+            world.step(delta, 6, 2);
+
+
+            if (camaraBox2d) {
+                camara.update();
+                renderer.render(world, camara.combined);
+
             }
-        }
-
-        colisionPapel();
-
-
-        stage.act();
-        stage.draw();
-        world.step(delta, 6, 2);
-
-        if (camaraBox2d) {
-            camara.update();
-            renderer.render(world, camara.combined);
 
         }
-
-
     }
 
     @Override
@@ -264,17 +267,19 @@ public class EscenarioScreen extends Pantallas {
             }
         }
 
+        if (bodyArray[498] != null) {
+            bodyArray[498].destroyFixture(fixtureArray[498]);
+        }
+        if (bodyArray[499] != null) {
+            bodyArray[499].destroyFixture(fixtureArray[499]);
+        }
         shape.dispose();
         renderer.dispose();
         world.dispose();
+
     }
 
 //--------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
 
 
     public Fixture getFixtureArray(int indice) {
@@ -548,8 +553,6 @@ public class EscenarioScreen extends Pantallas {
         Vector2 pos = fixtureArray[i].getBody().getPosition();
 
 
-
-
         fixtureArray[i].getShape().setRadius(radio / reduccion);
         actorArray[i].setWidth((radio / reduccion) * 2);
         actorArray[i].setHeigth((radio / reduccion) * 2);
@@ -586,6 +589,7 @@ public class EscenarioScreen extends Pantallas {
             actorArray[PAPEL].setPosition(posicionPapel, velocidadSubida - actorArray[PAPEL].getHeight());
 
             sonidoDisparo.play();
+
 
         } else {
             velocidadSubida += 7;
@@ -677,6 +681,7 @@ public class EscenarioScreen extends Pantallas {
             musicaLaVida.stop();
             //disparar musica de muerte
             // esperar 2 segundos
+            dispose = false;
 
       /*
             juego.setScreen(juego.getGameOverScreen());*/
@@ -688,12 +693,10 @@ public class EscenarioScreen extends Pantallas {
                     GameOverScreen gameOverScreen = new GameOverScreen(juego);
                     juego.setScreen(gameOverScreen);
 
-                     dispose();
+                    dispose();
+
                 }
-            },1);
-
-
-
+            }, 1);
 
 
         }

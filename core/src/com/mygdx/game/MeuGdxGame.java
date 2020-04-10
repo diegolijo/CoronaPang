@@ -19,6 +19,14 @@ public class MeuGdxGame extends Game {
     //pantallas
     private GameOverScreen  gameOverScreen;
 
+    private MenuPrincipal menuScreen ;
+
+
+    public MenuPrincipal getMenuScreen() {
+        return menuScreen;
+    }
+
+
 
     public EscenarioScreen getEscenarioScreen() {
         return escenarioScreen;
@@ -70,8 +78,10 @@ public class MeuGdxGame extends Game {
 
 
 
-        MenuPrincipal menu = new MenuPrincipal(this);
-        setScreen(menu);
+         menuScreen = new MenuPrincipal(this);
+        setScreen(menuScreen);
+
+
 
 /*
         gameOverScreen = new GameOverScreen(this);
