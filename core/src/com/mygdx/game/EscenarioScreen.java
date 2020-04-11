@@ -9,16 +9,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.IntFloatMap;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 
 public class EscenarioScreen extends Pantallas {
 
-    public static int SUELO, PARED_R, TECHO, PARED_L, AVATAR, PIERNAS, PAPEL, BOTON_L, BOTON_R, BOTON_DISPARO, PRIMER_VIRUS, ELEMENT_COLISION1 = 498, ELEMENT_COLISION2 = 499;
+    public static int SUELO, PARED_R, TECHO, PARED_L, AVATAR, PATAS, PAPEL, BOTON_L, BOTON_R, BOTON_DISPARO, PRIMER_VIRUS, ELEMENT_COLISION1 = 498, ELEMENT_COLISION2 = 499;
+    private int PATAS_ACTUAL;
 
     //FILTROS DE MCOLISION
     private final short CATEGORY_ESCENARIO = 0000000000000001;
@@ -28,11 +29,11 @@ public class EscenarioScreen extends Pantallas {
     // activa colisiones
     final short MASK_ESCENARIO = 0000000000000111;
     final short MASK_AVATAR = 0000000000000111;
-    final short MASK_BOLA = 0000000000000111;
+    final short MASK_BOLA = 0000000000000011;
 
     //----------  scene2d  --------------
     private Stage stage;
-    private Texture textVirusVerde, textVirusRosa, textFondo, textFondo2, textFondo3, textFondo4, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo, textPiernas;
+    private Texture textVirusVerde, textVirusRosa, textFondo, textFondo2, textFondo3, textFondo4, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo, textPatas0, textPatas1, textPatas2, textPatas3, textPatas4;
     private ActorScene2d[] actorArray = new ActorScene2d[500];
     private Sound sonidoBola, sonidoPedo, sonidoDisparo, sonidoMuerte;
     private Music musicaLaVida;
@@ -71,8 +72,6 @@ public class EscenarioScreen extends Pantallas {
     private boolean dispose = true;
 
 
-
-
     public EscenarioScreen(MeuGdxGame juego, int nivel) {
         super(juego);
         this.nivel = nivel;
@@ -87,16 +86,9 @@ public class EscenarioScreen extends Pantallas {
     public void show() {
 
 
-
         //creamos un imputProcesor  le mandanmos la referencia de esta pantalla
         ProcesadorInEscenario p = new ProcesadorInEscenario(this);
         Gdx.input.setInputProcessor(p);
-
-
-
-
-
-
 
 
         if (juego.getSO() == 0) {
@@ -125,7 +117,12 @@ public class EscenarioScreen extends Pantallas {
         textFondo3 = juego.getManager().get("Castros.png");
         textFondo4 = juego.getManager().get("VillaParaiso.png");
 
-        textPiernas = juego.getManager().get("Patinete100px.png");
+        textPatas0 = juego.getManager().get("Patas200px0.png");
+        textPatas1 = juego.getManager().get("Patas200px1.png");
+        textPatas2 = juego.getManager().get("Patas200px2.png");
+        textPatas3 = juego.getManager().get("Patas200px3.png");
+        textPatas4 = juego.getManager().get("Patas200px4.png");
+
 
         sonidoDisparo = juego.getManager().get("audio/disparo.wav");
         sonidoPedo = juego.getManager().get("audio/pedo.wav");
@@ -147,8 +144,6 @@ public class EscenarioScreen extends Pantallas {
         camara.translate(32, 18);  //y = 8
 
 
-
-
         crearEscenario();
         crearAvatar();
         crearPapel();
@@ -161,11 +156,9 @@ public class EscenarioScreen extends Pantallas {
 
         //temporizador
         skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
-        boton = new TextButton(tiempo+"", skin);
+        boton = new TextButton(tiempo + "", skin);
         boton.setPosition(320 - boton.getWidth() / 2, 320);
         stage.addActor(boton);
-
-
 
 
         world.setContactListener(new ContactListener() {
@@ -322,26 +315,26 @@ public class EscenarioScreen extends Pantallas {
 //--------------------------------------------------------------------------------------------------------------------------------
 
 
-    private Timer.Task myTimerTask = new Timer.Task() {
+    private Timer.Task taskReloj = new Timer.Task() {
         @Override
         public void run() {
-            doSmth();
+            cuentaRelloj();
         }
 
 
     };
 
     public void startTimer() {
-        Timer.schedule(myTimerTask, 1f, 1f);
+        Timer.schedule(taskReloj, 1f, 1f);
     }
 
-    public void doSmth() {
+    public void cuentaRelloj() {
 
         System.out.println("yeahhhhhhhhh");
         tiempo = tiempo - 1;
 
 
-        boton.setText(tiempo+"");
+        boton.setText(tiempo + "");
 
         if (tiempo == 0) {
 
@@ -464,6 +457,31 @@ public class EscenarioScreen extends Pantallas {
 
     public void crearAvatar() {
 
+
+        // patas
+        PATAS = siguieteElemento;
+        PATAS_ACTUAL = siguieteElemento;
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas0, 4, 4, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        siguieteElemento = siguieteElemento + 1;
+
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas1, 4, 4, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        siguieteElemento = siguieteElemento + 1;
+
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas2, 4, 4, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        siguieteElemento = siguieteElemento + 1;
+
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas3, 4, 4, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        siguieteElemento = siguieteElemento + 1;
+
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas4, 4, 4, false);
+        stage.addActor(actorArray[siguieteElemento]);
+        siguieteElemento = siguieteElemento + 1;
+
+
         AVATAR = siguieteElemento;
         //dimensiones en metros 2x6
         float w = 1.5f;
@@ -504,42 +522,160 @@ public class EscenarioScreen extends Pantallas {
 
         siguieteElemento = siguieteElemento + 1;
 
-        // piernas
 
-        PIERNAS = siguieteElemento;
-
-        actorArray[siguieteElemento] = new ActorScene2d(textPiernas, 4, 4, false);
-        stage.addActor(actorArray[siguieteElemento]);
-        siguieteElemento = siguieteElemento + 1;
+        startTPiernas();
 
 
     }
+
+    //movimiento de la patas
+
+    private int cuentaPatas = 0;
+
+    private Timer.Task taskPiernas = new Timer.Task() {
+        @Override
+        public void run() {
+
+            //si el avatar se mueve
+            if (fixtureArray[AVATAR].getBody().getLinearVelocity().x > 1) {
+                PATAS_ACTUAL += 1;
+                if (PATAS_ACTUAL == PATAS + 4) {
+                    PATAS_ACTUAL = PATAS;
+                }
+            } else if (fixtureArray[AVATAR].getBody().getLinearVelocity().x < -1) {
+
+                if (PATAS_ACTUAL == PATAS) {
+                    PATAS_ACTUAL = PATAS + 4;
+                }
+                PATAS_ACTUAL -= 1;
+            } else {
+
+                PATAS_ACTUAL = PATAS
+                ;
+            }
+        }
+    };
+
+
+    public void startTPiernas() {
+        Timer.schedule(taskPiernas, 1f, 0.1f);
+    }
+
 
     public void crearBolasIniciales() {
         PRIMER_VIRUS = siguieteElemento;
 
 
-        float[] radio = {1, 3f, 3f, 4f, 5f, 2, 2, 2, 3, 3};
-        int[] x = {2, 3, 4, 5, 6, 50, 55, -3, 0, 1};
-        int y = 20;
+        float[] radio = {2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        int[] posX = {5, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        int[] posY = {20, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        float[] velInicialX = {velocidadInicialX, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        float[] restitucion = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    //    for (int i = 0; i < nivel; i++) {
+        int numBolas;
+        Texture texture;
 
-            crearBola(siguieteElemento, radio[nivel], x[1], y, velocidadInicialX, 0, 1, textVirusVerde);
+
+        //creamos la bolas de cada nivel
+        switch (nivel) {
+            case (1): {
+
+                numBolas = 1;
+                radio[0] = 3;
+                posX[0] = 10;
+                posY[0] = 25;
+                texture = juego.getManager().get("virusAmarillo100.png");
+                velInicialX[0] = velocidadInicialX;
+                restitucion[0] = 0.95f;
 
 
-   //     }
+                radio[1] = 0; //indicamos al for cuantas bolas tiene que hacer
+
+                break;
+            }
+            case (2): {
+
+                numBolas = 2;
+
+                radio[1] = 3;
+                posX[1] = 59;
+                posY[1] = 20;
+                velInicialX[1] = -velocidadInicialX;
+                texture = juego.getManager().get("virusAmarillo100.png");
+                restitucion[1] = 0.95f;
+
+
+                radio[2] = 0;
+
+                break;
+            }
+            case (3): {
+
+                numBolas = 1;
+
+                radio[0] = 4;
+                posX[0] = 32;
+                posY[0] = 25;
+                velInicialX[0] = 0;
+                restitucion[0] = 0.95f;
+                texture = juego.getManager().get("virusRosa100.png");
+
+                radio[1] = 0;
+
+                break;
+            }
+            case (4): {
+
+                numBolas = 1;
+
+                radio[0] = 5;
+                posX[0] = 5;
+                posY[0] = 25;
+                velInicialX[0] = 0;
+                restitucion[0] = 0.95f;
+                texture = juego.getManager().get("virusRosa100.png");
+
+                radio[1] = 0;
+
+                break;
+            }
+            default: {
+
+
+                numBolas = 1;
+
+                radio[0] = 1;
+                posX[0] = 5;
+                posY[0] = 20;
+                velInicialX[0] = velocidadInicialX;
+                texture = juego.getManager().get("virusRosa100.png");
+                restitucion[0] = 0.95f;
+
+                radio[1] = 0;
+                break;
+            }
+
+        }
+
+        for (int i = 0; i < numBolas; i++) {
+            crearBola(siguieteElemento, radio[i], posX[i], posY[i], velInicialX[i], 0, restitucion[i], 1, texture);
+        }
+
+
+
+
+
+
+
 
 /*        for (int i = 0; i < nivel; i++) {
             int x = (int) (Math.random() * 20);
-
-
             crearBola(siguieteElemento, (int) (Math.random() * 2) + 0.5f, x, 18, velocidadInicialX, 0, 1, textVirusVerde);
         }*/
     }
 
     public void crearBola(int numeroBola, float radio, float posX, float posY, float velX,
-                          float velY, float restitution, Texture texture) {
+                          float velY, float restitution, float densidad, Texture texture) {
 
         circleShape = new CircleShape();
         def.type = BodyDef.BodyType.DynamicBody;
@@ -550,7 +686,7 @@ public class EscenarioScreen extends Pantallas {
 
         //creando fixtures
         circleShape.setRadius(radio);
-        fixtureArray[numeroBola] = bodyArray[numeroBola].createFixture(circleShape, 1);
+        fixtureArray[numeroBola] = bodyArray[numeroBola].createFixture(circleShape, densidad);
 
         //filtro colision box2d
         Filter filter = fixtureArray[numeroBola].getFilterData();
@@ -589,8 +725,16 @@ public class EscenarioScreen extends Pantallas {
         float y = (bodyArray[AVATAR].getPosition().y * TO_PIXELES) - h;
 
         actorArray[AVATAR].setPosition(x, y);
-        //piernas
-        actorArray[PIERNAS].setPosition(x, y - actorArray[PIERNAS].getHeight());
+
+        //patas
+        //ocultamos las demas paras
+        actorArray[PATAS].setPosition(x, -200);
+        actorArray[PATAS + 1].setPosition(x, -200);
+        actorArray[PATAS + 2].setPosition(x, -200);
+        actorArray[PATAS + 3].setPosition(x, -200);
+        actorArray[PATAS + 4].setPosition(x, -200);
+
+        actorArray[PATAS_ACTUAL].setPosition(x - 6, y - 12);
 
 
         //viruses
@@ -662,7 +806,7 @@ public class EscenarioScreen extends Pantallas {
         //impulso despues de romper
         fixtureArray[i].getBody().setLinearVelocity(velocidadInicialX, Math.abs(vel));
         // velociodad nueva bola
-        crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, -velocidadInicialX, Math.abs(vel), 1f, actorArray[i].getTexture());
+        crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, -velocidadInicialX, Math.abs(vel), 1f, 0.95f, actorArray[i].getTexture());
 
         //mata la bola
         if (fixtureArray[siguieteElemento - 1].getShape().getRadius() < radioMinimo) { // comprueba el tamaño de la bola para matar bola
@@ -749,7 +893,7 @@ public class EscenarioScreen extends Pantallas {
                                 Vector2 vel = fixtureArray[i].getBody().getLinearVelocity();
                                 Vector2 pos = fixtureArray[i].getBody().getPosition();
                                 //        for (int k = 0; k < 5; k++) {
-                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, actorArray[i].getTexture());
+                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, 0.95f, actorArray[i].getTexture());
                                 //       }
 
                             } else {
@@ -768,7 +912,7 @@ public class EscenarioScreen extends Pantallas {
                                 Vector2 vel = fixtureArray[j].getBody().getLinearVelocity();
                                 Vector2 pos = fixtureArray[j].getBody().getPosition();
                                 //          for (int k = 5; k < 5; k++) {
-                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, actorArray[j].getTexture());
+                                crearBola(siguieteElemento, radio / reduccion, pos.x, pos.y, vel.x * 10, -vel.y * 10, 1f, 0.95f, actorArray[j].getTexture());
 
                                 //        }
 
@@ -790,7 +934,7 @@ public class EscenarioScreen extends Pantallas {
 
     private void siguiente() {
 
-        myTimerTask.cancel();
+        taskReloj.cancel();
 
 
         musicaLaVida.stop();
@@ -821,16 +965,13 @@ public class EscenarioScreen extends Pantallas {
     private void muerte() {
 
 
-
-        myTimerTask.cancel();
-
+        taskReloj.cancel();
 
 
         if (!invencible) {
             Filter filter = fixtureArray[AVATAR].getFilterData();
             filter.maskBits = 000000000000110;
             fixtureArray[AVATAR].setFilterData(filter);
-
 
 
             sonidoMuerte.play();

@@ -61,7 +61,12 @@ public class MeuGdxGame extends Game {
         manager.load("Belvis.png", Texture.class);
         manager.load("Castros.png", Texture.class);
         manager.load("VillaParaiso.png", Texture.class);
-        manager.load("Patinete100px.png", Texture.class);
+        manager.load("Patas200px0.png", Texture.class);
+        manager.load("Patas200px1.png", Texture.class);
+        manager.load("Patas200px2.png", Texture.class);
+        manager.load("Patas200px3.png", Texture.class);
+        manager.load("Patas200px4.png", Texture.class);
+
         manager.load("GameOver.png", Texture.class);
         manager.load("Logo2.png", Texture.class);
 

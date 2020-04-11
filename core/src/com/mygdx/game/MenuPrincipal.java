@@ -58,7 +58,7 @@ public class MenuPrincipal extends Pantallas {
                 //pulsamos el boton
 
                 escenarioScreen = new EscenarioScreen(juego, nivel);
-                juego.setScreen(escenarioScreen);
+                juego. setScreen(escenarioScreen);
 
 
 
