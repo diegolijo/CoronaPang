@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -20,6 +21,8 @@ public class GameOverScreen extends Pantallas {
     private Skin skin;
     private EscenarioScreen escenarioScreen;
 
+    private Music musica;
+
 
 
     public GameOverScreen(final MeuGdxGame juego) {
@@ -32,6 +35,9 @@ public class GameOverScreen extends Pantallas {
     @Override
     public void show() {
 
+       musica = juego.getManager().get("audio/bajoLoop.mp3");
+       musica.play();
+        musica.setLooping(true);
 
         stage = new Stage(new FitViewport(640, 360));
 
@@ -57,6 +63,8 @@ public class GameOverScreen extends Pantallas {
             public void changed(ChangeEvent event, Actor actor) {
                 //pulsamos el boton
                juego.setScreen(juego.getMenuScreen());
+                musica.stop();
+
             }
         });
     }

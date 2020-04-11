@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -25,14 +28,17 @@ public class EscenarioScreen extends Pantallas {
     // activa colisiones
     final short MASK_ESCENARIO = 0000000000000111;
     final short MASK_AVATAR = 0000000000000111;
-    final short MASK_BOLA = 0000000000000011;
+    final short MASK_BOLA = 0000000000000111;
 
     //----------  scene2d  --------------
     private Stage stage;
-    private Texture textVirusVerde, textVirusRosa, textFondo, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo, textPiernas;
+    private Texture textVirusVerde, textVirusRosa, textFondo, textFondo2, textFondo3, textFondo4, textActorAvatar, textPapel, textBotonL, textBotonR, textBotonDisparo, textPiernas;
     private ActorScene2d[] actorArray = new ActorScene2d[500];
-    private Sound sonidoBola, sonidoPedo, sonidoDisparo;
+    private Sound sonidoBola, sonidoPedo, sonidoDisparo, sonidoMuerte;
     private Music musicaLaVida;
+    private Skin skin;
+    private TextButton boton;
+    private int tiempo = 60;
 
     //------------  box2d  ------------
     private World world;
@@ -58,16 +64,18 @@ public class EscenarioScreen extends Pantallas {
 
 
     // ------------  fuses -------------
-    private int numBolas;
-    private boolean camaraBox2d = true, debugStage = false, invencible = false;
+    private int nivel;
+    private boolean camaraBox2d = false, debugStage = false, invencible = false;
     private int velocidadSubida;
     private float posicionPapel;
     private boolean dispose = true;
 
 
-    public EscenarioScreen(MeuGdxGame juego, int numBolas) {
+
+
+    public EscenarioScreen(MeuGdxGame juego, int nivel) {
         super(juego);
-        this.numBolas = numBolas;
+        this.nivel = nivel;
         fixtureArray[ELEMENT_COLISION1] = null;
         fixtureArray[ELEMENT_COLISION2] = null;
 
@@ -79,9 +87,16 @@ public class EscenarioScreen extends Pantallas {
     public void show() {
 
 
+
         //creamos un imputProcesor  le mandanmos la referencia de esta pantalla
         ProcesadorInEscenario p = new ProcesadorInEscenario(this);
         Gdx.input.setInputProcessor(p);
+
+
+
+
+
+
 
 
         if (juego.getSO() == 0) {
@@ -99,16 +114,23 @@ public class EscenarioScreen extends Pantallas {
         textVirusVerde = juego.getManager().get("virusAmarillo100.png");
         textVirusRosa = juego.getManager().get("virusRosa100.png");
         textActorAvatar = juego.getManager().get("avatar300x100.png");
+
         textPapel = juego.getManager().get("papelCulo100x3600.png");
         textBotonL = juego.getManager().get("boton100pxL.png");
         textBotonR = juego.getManager().get("boton100pxR.png");
         textBotonDisparo = juego.getManager().get("boton100pxPapel.png");
+
         textFondo = juego.getManager().get("Alameda.png");
+        textFondo2 = juego.getManager().get("Belvis.png");
+        textFondo3 = juego.getManager().get("Castros.png");
+        textFondo4 = juego.getManager().get("VillaParaiso.png");
+
         textPiernas = juego.getManager().get("Patinete100px.png");
 
         sonidoDisparo = juego.getManager().get("audio/disparo.wav");
         sonidoPedo = juego.getManager().get("audio/pedo.wav");
         musicaLaVida = juego.getManager().get("audio/LaVidaEsAsi.mp3");
+        sonidoMuerte = juego.getManager().get("audio/gritoMuerte.mp3");
 
         musicaLaVida.play();
         musicaLaVida.setVolume(0.2f);
@@ -124,11 +146,26 @@ public class EscenarioScreen extends Pantallas {
         camara = new OrthographicCamera(64, 36);
         camara.translate(32, 18);  //y = 8
 
+
+
+
         crearEscenario();
         crearAvatar();
         crearPapel();
         creatBotones();
         crearBolasIniciales();
+
+
+        startTimer();
+
+
+        //temporizador
+        skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+        boton = new TextButton(tiempo+"", skin);
+        boton.setPosition(320 - boton.getWidth() / 2, 320);
+        stage.addActor(boton);
+
+
 
 
         world.setContactListener(new ContactListener() {
@@ -285,6 +322,36 @@ public class EscenarioScreen extends Pantallas {
 //--------------------------------------------------------------------------------------------------------------------------------
 
 
+    private Timer.Task myTimerTask = new Timer.Task() {
+        @Override
+        public void run() {
+            doSmth();
+        }
+
+
+    };
+
+    public void startTimer() {
+        Timer.schedule(myTimerTask, 1f, 1f);
+    }
+
+    public void doSmth() {
+
+        System.out.println("yeahhhhhhhhh");
+        tiempo = tiempo - 1;
+
+
+        boton.setText(tiempo+"");
+
+        if (tiempo == 0) {
+
+            muerte();
+
+
+        }
+    }
+
+
     public Fixture getFixtureArray(int indice) {
         return fixtureArray[indice];
     }
@@ -302,12 +369,35 @@ public class EscenarioScreen extends Pantallas {
     //--- cear actores y fixtures --
     public void crearEscenario() {
 
-        actorArray[siguieteElemento] = new ActorScene2d(textFondo, 64, 36, false);
-        stage.addActor(actorArray[siguieteElemento]);
-        siguieteElemento = siguieteElemento + 1;
 
+        //seleccoionamos el fondo
+        switch (nivel) {
+
+            case 1:
+                actorArray[siguieteElemento] = new ActorScene2d(textFondo, 64, 36, false);
+                stage.addActor(actorArray[siguieteElemento]);
+                siguieteElemento = siguieteElemento + 1;
+                break;
+            case 2:
+                actorArray[siguieteElemento] = new ActorScene2d(textFondo2, 64, 36, false);
+                stage.addActor(actorArray[siguieteElemento]);
+                siguieteElemento = siguieteElemento + 1;
+                break;
+            case 3:
+                actorArray[siguieteElemento] = new ActorScene2d(textFondo3, 64, 36, false);
+                stage.addActor(actorArray[siguieteElemento]);
+                siguieteElemento = siguieteElemento + 1;
+                break;
+            default:
+                actorArray[siguieteElemento] = new ActorScene2d(textFondo4, 64, 36, false);
+                stage.addActor(actorArray[siguieteElemento]);
+                siguieteElemento = siguieteElemento + 1;
+                break;
+        }
+
+
+        //paredes
         shape = new PolygonShape();
-
         float[] x = {32, 64, 32, 0};
         float[] y = {5, 18, 36, 18};
         float[] w = {32, 1, 32, 1};
@@ -331,6 +421,8 @@ public class EscenarioScreen extends Pantallas {
 
             siguieteElemento = siguieteElemento + 1;
         }
+
+        //
 
     }
 
@@ -427,21 +519,23 @@ public class EscenarioScreen extends Pantallas {
         PRIMER_VIRUS = siguieteElemento;
 
 
-   /*     float[] radio = {4, 2.5f, 2f, 1.2f, 2.1f, 2, 2, 2, 3, 3};
+        float[] radio = {1, 3f, 3f, 4f, 5f, 2, 2, 2, 3, 3};
         int[] x = {2, 3, 4, 5, 6, 50, 55, -3, 0, 1};
-        int y = 17;
+        int y = 20;
 
-        for (int i = 0; i < numBolas; i++) {
+    //    for (int i = 0; i < nivel; i++) {
 
-            crearBola(siguieteElemento, radio[i], x[i], y, velocidadInicialX, 0, 1, textVirusVerde);
+            crearBola(siguieteElemento, radio[nivel], x[1], y, velocidadInicialX, 0, 1, textVirusVerde);
 
 
+   //     }
+
+/*        for (int i = 0; i < nivel; i++) {
+            int x = (int) (Math.random() * 20);
+
+
+            crearBola(siguieteElemento, (int) (Math.random() * 2) + 0.5f, x, 18, velocidadInicialX, 0, 1, textVirusVerde);
         }*/
-
-        for (int i = 0; i < numBolas; i++) {
-            int x = (int) (Math.random() *20);
-            crearBola(siguieteElemento, (int)(Math.random() * 2)+0.5f, x, 18, velocidadInicialX, 0, 1, textVirusVerde);
-        }
     }
 
     public void crearBola(int numeroBola, float radio, float posX, float posY, float velX,
@@ -553,7 +647,6 @@ public class EscenarioScreen extends Pantallas {
 
         Gdx.input.vibrate(100);
 
-
         //
         float reduccion = 2f;
         float radioMinimo = 0.5f;
@@ -588,12 +681,12 @@ public class EscenarioScreen extends Pantallas {
 
         //----------------------- comprueba se se rompieron todas la bolas -------------------------
         int bolas = siguieteElemento - PRIMER_VIRUS;
-        for (int j = PRIMER_VIRUS; j < siguieteElemento ; j++) {
+        for (int j = PRIMER_VIRUS; j < siguieteElemento; j++) {
             if (!actorArray[j].isVivo()) {
                 bolas -= 1;
             }
 
-            if (bolas ==0) {
+            if (bolas == 0) {
                 siguiente();
             }
 
@@ -697,6 +790,8 @@ public class EscenarioScreen extends Pantallas {
 
     private void siguiente() {
 
+        myTimerTask.cancel();
+
 
         musicaLaVida.stop();
         //disparar musica de muerte
@@ -724,31 +819,37 @@ public class EscenarioScreen extends Pantallas {
 
 
     private void muerte() {
+
+
+
+        myTimerTask.cancel();
+
+
+
         if (!invencible) {
             Filter filter = fixtureArray[AVATAR].getFilterData();
             filter.maskBits = 000000000000110;
             fixtureArray[AVATAR].setFilterData(filter);
 
 
+
+            sonidoMuerte.play();
             musicaLaVida.stop();
-            //disparar musica de muerte
-            // esperar 2 segundos
-            dispose = false;
 
-      /*
-            juego.setScreen(juego.getGameOverScreen());*/
 
+            //sigue renderizando
+            dispose = true;
+
+
+            // esperar x segundos
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
-
                     GameOverScreen gameOverScreen = new GameOverScreen(juego);
                     juego.setScreen(gameOverScreen);
-
-                    dispose();
-
+                    //      dispose();
                 }
-            }, 1);
+            }, 0.5f);
 
 
         }

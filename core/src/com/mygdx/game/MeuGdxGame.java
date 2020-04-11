@@ -58,6 +58,9 @@ public class MeuGdxGame extends Game {
         manager.load("boton100pxR.png", Texture.class);
         manager.load("boton100pxPapel.png", Texture.class);
         manager.load("Alameda.png", Texture.class);
+        manager.load("Belvis.png", Texture.class);
+        manager.load("Castros.png", Texture.class);
+        manager.load("VillaParaiso.png", Texture.class);
         manager.load("Patinete100px.png", Texture.class);
         manager.load("GameOver.png", Texture.class);
         manager.load("Logo2.png", Texture.class);
@@ -65,7 +68,9 @@ public class MeuGdxGame extends Game {
 
         manager.load("audio/disparo.wav", Sound.class);
         manager.load("audio/pedo.wav", Sound.class);
+        manager.load("audio/gritoMuerte.mp3", Sound.class);
         manager.load("audio/LaVidaEsAsi.mp3", Music.class);
+        manager.load("audio/bajoLoop.mp3", Music.class);
         manager.finishLoading();
 
 
