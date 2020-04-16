@@ -16,11 +16,8 @@ public class ActorScene2d extends Actor {
     private float heigth;
 
 
-
-
-    public ActorScene2d(Texture avatar, float width, float heigth, boolean vivo) {
-        this.texture = avatar;
-   //     this.sprite = new Sprite(texture);
+    public ActorScene2d(Texture texture, float width, float heigth, boolean vivo) {
+        this.texture = texture;
         this.width = width;
         this.heigth = heigth;
         this.vivo= vivo;

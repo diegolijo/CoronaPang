@@ -7,11 +7,21 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.utils.IntFloatMap;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -59,13 +69,16 @@ public class EscenarioScreen extends Pantallas {
     //pantallas
 
 
-    // bandera
+    // banderas
     private boolean puedoDisparar = true;
-    private boolean disparoIniciado, tocoTecho, papelUsado = false;
+    private boolean disparoIniciado;
+    private boolean tocoTecho;
+    private int nivel;
+
 
 
     // ------------  fuses -------------
-    private int nivel;
+
     private boolean camaraBox2d = false, debugStage = false, invencible = false;
     private int velocidadSubida;
     private float posicionPapel;
@@ -156,6 +169,7 @@ public class EscenarioScreen extends Pantallas {
 
         //temporizador
         skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+        //   Window boton = new Window(""+tiempo,skin);
         boton = new TextButton(tiempo + "", skin);
         boton.setPosition(320 - boton.getWidth() / 2, 320);
         stage.addActor(boton);
@@ -330,17 +344,10 @@ public class EscenarioScreen extends Pantallas {
 
     public void cuentaRelloj() {
 
-        System.out.println("yeahhhhhhhhh");
         tiempo = tiempo - 1;
-
-
         boton.setText(tiempo + "");
-
         if (tiempo == 0) {
-
             muerte();
-
-
         }
     }
 
@@ -461,23 +468,23 @@ public class EscenarioScreen extends Pantallas {
         // patas
         PATAS = siguieteElemento;
         PATAS_ACTUAL = siguieteElemento;
-        actorArray[siguieteElemento] = new ActorScene2d(textPatas0, 4, 4, false);
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas0, 3, 4, false);
         stage.addActor(actorArray[siguieteElemento]);
         siguieteElemento = siguieteElemento + 1;
 
-        actorArray[siguieteElemento] = new ActorScene2d(textPatas1, 4, 4, false);
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas1, 3, 4, false);
         stage.addActor(actorArray[siguieteElemento]);
         siguieteElemento = siguieteElemento + 1;
 
-        actorArray[siguieteElemento] = new ActorScene2d(textPatas2, 4, 4, false);
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas2, 3, 4, false);
         stage.addActor(actorArray[siguieteElemento]);
         siguieteElemento = siguieteElemento + 1;
 
-        actorArray[siguieteElemento] = new ActorScene2d(textPatas3, 4, 4, false);
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas3, 3, 4, false);
         stage.addActor(actorArray[siguieteElemento]);
         siguieteElemento = siguieteElemento + 1;
 
-        actorArray[siguieteElemento] = new ActorScene2d(textPatas4, 4, 4, false);
+        actorArray[siguieteElemento] = new ActorScene2d(textPatas4, 3, 4, false);
         stage.addActor(actorArray[siguieteElemento]);
         siguieteElemento = siguieteElemento + 1;
 
@@ -734,7 +741,7 @@ public class EscenarioScreen extends Pantallas {
         actorArray[PATAS + 3].setPosition(x, -200);
         actorArray[PATAS + 4].setPosition(x, -200);
 
-        actorArray[PATAS_ACTUAL].setPosition(x - 6, y - 12);
+        actorArray[PATAS_ACTUAL].setPosition(x - 1, y - 7);
 
 
         //viruses

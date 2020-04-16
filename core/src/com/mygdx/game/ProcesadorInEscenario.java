@@ -11,22 +11,22 @@ import static com.mygdx.game.EscenarioScreen.*;
 // implementa la interface InputProcessor;
 public class ProcesadorInEscenario extends InputAdapter {
 
-    private EscenarioScreen box2dScene2D;
+    private EscenarioScreen escenarioScreen;
     private Fixture fixtureAvatar;
-    private boolean isTouchL = false, isTouchR = false, puedoDisparar = true;
+    private boolean isTouchL = false;
+    private boolean isTouchR = false;
     private int xL, xR,  Lw,buttonR,buttonL;
     private int velocidadAvatar = 20;
 
 
 
 
-    public ProcesadorInEscenario(EscenarioScreen box2dScene2D) {
-        this.box2dScene2D = box2dScene2D;
+    public ProcesadorInEscenario(EscenarioScreen escenarioScreen) {
+        this.escenarioScreen = escenarioScreen;
     }
 
 
     public void setPuedoDisparar(boolean puedoDisparar) {
-        this.puedoDisparar = puedoDisparar;
     }
 
 
@@ -40,9 +40,8 @@ public class ProcesadorInEscenario extends InputAdapter {
 
         //disparo
         if (screenX > 500 ){
-            if (box2dScene2D.isPuedoDisparar()) {
-                box2dScene2D.disparo(true);
-                puedoDisparar = false;
+            if (escenarioScreen.isPuedoDisparar()) {
+                escenarioScreen.disparo(true);
             }
         }
 
@@ -56,7 +55,7 @@ public class ProcesadorInEscenario extends InputAdapter {
 
 
 
-        fixtureAvatar = box2dScene2D.getFixtureArray(AVATAR);
+        fixtureAvatar = escenarioScreen.getFixtureArray(AVATAR);
 
 
         // dar valores a las variables Lw , xR                          <-------------------------------------------------------------------------
@@ -86,12 +85,12 @@ public class ProcesadorInEscenario extends InputAdapter {
 
 
 
-        if (box2dScene2D.juego.getSO()== 1){
+        if (escenarioScreen.juego.getSO()== 1){
             screenX = screenX*2;
             screenY = screenY*2;
         }
 
-        fixtureAvatar = box2dScene2D.getFixtureArray(AVATAR);
+        fixtureAvatar = escenarioScreen.getFixtureArray(AVATAR);
 
         // ** el (0,0) suerior izquiera
         if (screenX < 100){

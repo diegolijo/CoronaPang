@@ -24,7 +24,7 @@
 -dontwarn android.support.**
 -dontwarn com.badlogic.gdx.backends.android.AndroidFragmentApplication
 -dontwarn com.badlogic.gdx.utils.GdxBuild
--dontwarn com.badlogic.gdx.physics.box2dScene2D.utils.Box2DBuild
+-dontwarn com.badlogic.gdx.physics.escenarioScreen.utils.Box2DBuild
 -dontwarn com.badlogic.gdx.jnigen.BuildTarget*
 -dontwarn com.badlogic.gdx.graphics.g2d.freetype.FreetypeBuild
 
@@ -34,7 +34,7 @@
    <init>(com.badlogic.gdx.Application, android.content.Context, java.lang.Object, com.badlogic.gdx.backends.android.AndroidApplicationConfiguration);
 }
 
--keepclassmembers class com.badlogic.gdx.physics.box2dScene2D.World {
+-keepclassmembers class com.badlogic.gdx.physics.escenarioScreen.World {
    boolean contactFilter(long, long);
    void    beginContact(long);
    void    endContact(long);
