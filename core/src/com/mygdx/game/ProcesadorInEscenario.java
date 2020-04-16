@@ -92,7 +92,7 @@ public class ProcesadorInEscenario extends InputAdapter {
 
         fixtureAvatar = escenarioScreen.getFixtureArray(AVATAR);
 
-        // ** el (0,0) suerior izquiera
+        // ** el (0,0) suerior izquiera ??
         if (screenX < 100){
             isTouchL = true;
             fixtureAvatar.getBody().setLinearVelocity(-velocidadAvatar, 0f);
